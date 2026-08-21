@@ -1,0 +1,21 @@
+<div class="toast-container">
+  <div *ngFor="let toast of toastService.toasts$ | async" 
+       class="toast-item" 
+       [ngClass]="'toast-' + toast.type"
+       role="alert" 
+       aria-live="assertive" 
+       aria-atomic="true">
+    
+    <div class="toast-icon">
+      {{ getIcon(toast.type) }}
+    </div>
+    
+    <div class="toast-content">
+      {{ toast.message }}
+    </div>
+    
+    <button class="toast-close" (click)="toastService.remove(toast.id)" aria-label="Close">
+      &times;
+    </button>
+  </div>
+</div>

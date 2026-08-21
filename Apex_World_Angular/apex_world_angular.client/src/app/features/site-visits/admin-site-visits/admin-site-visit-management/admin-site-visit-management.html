@@ -1,0 +1,136 @@
+<app-admin-header breadcrumb="Site-Visit Management" title="Site-Visit Requests"></app-admin-header>
+
+<div class="cm-content-area">
+  
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card highlight-border-blue kpi-filter-btn" style="cursor: pointer; transition: transform 0.2s; border-left: 4px solid var(--primary);">
+      <p class="kpi-label">TOTAL REQUESTS</p>
+      <h2 class="kpi-value" id="kpi-total">{{ totalRequests }} Requests</h2>
+    </div>
+    <div class="kpi-card highlight-border kpi-filter-btn" style="cursor: pointer; transition: transform 0.2s;">
+      <p class="kpi-label">APPROVED VISITS</p>
+      <h2 class="kpi-value" id="kpi-active">{{ approvedVisits }} Approved</h2>
+    </div>
+    <div class="kpi-card highlight-border-orange kpi-filter-btn" style="cursor: pointer; transition: transform 0.2s;">
+      <p class="kpi-label">PENDING APPROVAL</p>
+      <h2 class="kpi-value" id="kpi-pending">{{ pendingVisits }} Pending</h2>
+    </div>
+    <div class="kpi-card kpi-filter-btn" style="cursor: pointer; transition: transform 0.2s; border-left: 4px solid var(--danger);">
+      <p class="kpi-label">DENIED VISITS</p>
+      <h2 class="kpi-value" id="kpi-denied">{{ deniedVisits }} Denied</h2>
+    </div>
+  </div>
+
+  <!-- Directory Section -->
+  <div class="directory-section">
+    <div class="agy-table-container">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <div class="agy-table-title" style="margin:0;">Site-Visit Requests &amp; Account Status Verification Registry</div>
+        <div style="display: flex; gap: 8px;">
+          <button class="action-btn action-approve" (click)="approveSelected()" [disabled]="selectedBookingIds.size === 0">Approve Selected</button>
+          <button class="action-btn action-reject" (click)="denySelected()" [disabled]="selectedBookingIds.size === 0">Deny Selected</button>
+        </div>
+      </div>
+      
+      <table class="agy-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll($event)"></th>
+            <th>Booking ID</th>
+            <th>Customer Name</th>
+            <th>Property</th>
+            <th>Visit Date &amp; Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customer-list">
+          <tr *ngIf="siteVisits.length === 0">
+            <td colspan="7" style="text-align:center;padding:28px;color:#64748B;font-size:0.9rem;">No data available</td>
+          </tr>
+          <tr *ngFor="let item of siteVisits" [ngClass]="{'selected': selectedBookingIds.has(item.id)}">
+            <td>
+              <input type="checkbox" [checked]="selectedBookingIds.has(item.id)" (change)="toggleSelection(item.id)">
+            </td>
+            <td style="color: #2563EB; font-weight: 700;">{{ formatBookingId(item.id) }}</td>
+            <td>{{ item.buyerName || 'N/A' }}</td>
+            <td>{{ item.propertyName || 'N/A' }}</td>
+            <td>{{ (item.scheduledDate || item.bookingDate) | date:'dd MMMM yyyy' }}</td>
+            <td>
+              <span class="status-badge" 
+                    [ngClass]="{
+                      'approved': item.status === 'Approved' || item.status === 'PendingPayment', 
+                      'pending': item.status === 'PendingAdminApproval' || item.status === 'Pending' || item.status === 'RescheduleRequested' || item.status === 'CancellationRequested',
+                      'denied': item.status === 'Denied' || item.status === 'Cancelled' || item.status === 'Rejected'
+                    }">
+                {{ item.status === 'PendingAdminApproval' ? 'Pending' : (item.status === 'PendingPayment' ? 'Approved' : item.status) }}
+              </span>
+            </td>
+            
+            <td>
+              <!-- Standard Workflow -->
+              <ng-container *ngIf="item.status === 'PendingAdminApproval' || item.status === 'Pending'">
+                <button class="action-btn action-approve" style="padding: 5px 12px; font-size: 0.82rem;" (click)="approveBooking(item.id, 'standard')">Approve</button>
+                <button class="action-btn action-reject" style="padding: 5px 12px; font-size: 0.82rem;" (click)="promptDeny(item.id, 'standard')">Deny</button>
+              </ng-container>
+
+              <!-- Reschedule Workflow -->
+              <ng-container *ngIf="item.status === 'RescheduleRequested'">
+                <button class="action-btn action-primary" style="padding: 5px 12px; font-size: 0.82rem;" (click)="approveBooking(item.id, 'reschedule')">Approve Reschedule</button>
+                <button class="action-btn action-reject" style="padding: 5px 12px; font-size: 0.82rem;" (click)="promptDeny(item.id, 'reschedule')">Reject Reschedule</button>
+              </ng-container>
+
+              <!-- Cancellation Workflow -->
+              <ng-container *ngIf="item.status === 'CancellationRequested'">
+                <button class="action-btn action-secondary" style="padding: 5px 12px; font-size: 0.82rem;" (click)="approveBooking(item.id, 'cancel')">Approve Cancel</button>
+                <button class="action-btn action-reject" style="padding: 5px 12px; font-size: 0.82rem;" (click)="promptDeny(item.id, 'cancel')">Reject Cancel</button>
+              </ng-container>
+              
+              <!-- Completed / Final States -->
+              <ng-container *ngIf="item.status === 'Approved' || item.status === 'PendingPayment' || item.status === 'Denied' || item.status === 'Cancelled' || item.status === 'Rejected'">
+                <span class="action-text-approved" *ngIf="item.status === 'Approved' || item.status === 'PendingPayment'">Approved</span>
+                <span class="action-text-denied" *ngIf="item.status === 'Denied' || item.status === 'Cancelled' || item.status === 'Rejected'">Denied</span>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="agy-table-pagination">
+        <div class="agy-table-pagination-controls">
+          <app-pagination 
+            [currentPage]="pageNumber" 
+            [totalItems]="totalItems" 
+            [pageSize]="pageSize" 
+            (pageChange)="onPageChange($event)">
+          </app-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Denial Modal -->
+<div class="bm-modal-overlay" [class.show]="showDenyModal" (click)="closeDenyModal()">
+  <div class="bm-modal-content" style="width: 480px; border-radius: 16px; overflow: hidden;" (click)="$event.stopPropagation()">
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #B91C1C 0%, #EF4444 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">🚫</span>
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Confirm Rejection</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeDenyModal()">✕</button>
+    </div>
+    <div style="padding: 24px;">
+      <p style="margin: 0 0 12px; color: #334155; font-size: 0.95rem;">Please provide a reason. The user will be notified.</p>
+      <textarea rows="3" style="width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; resize: vertical; font-family: inherit; font-size: 0.9rem;"
+                placeholder="Reason for rejection..." [(ngModel)]="denyReason"></textarea>
+    </div>
+    <div class="receipt-modal-footer">
+      <button class="action-btn action-secondary" (click)="closeDenyModal()">Cancel</button>
+      <button class="action-btn action-reject" (click)="confirmDeny()">Confirm Rejection</button>
+    </div>
+  </div>
+</div>
+

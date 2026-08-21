@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="apex_world_angular.client/apex_world_angular.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="Apex_World_Angular.Server/Apex_World_Angular.Server.csproj" />
+</Solution>

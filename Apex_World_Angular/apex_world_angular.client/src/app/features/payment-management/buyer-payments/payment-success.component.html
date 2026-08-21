@@ -1,0 +1,57 @@
+<div class="ps-container">
+  <div class="ps-card">
+    <div class="ps-icon-wrapper" [class.verifying]="verifying" [class.error]="!verified && !verifying">
+      <span class="ps-checkmark" *ngIf="verified">✓</span>
+      <span class="ps-checkmark" *ngIf="verifying">⏳</span>
+      <span class="ps-checkmark" *ngIf="!verified && !verifying">❌</span>
+    </div>
+    
+    <h1 class="ps-title" *ngIf="verified">Payment Successful!</h1>
+    <h1 class="ps-title" *ngIf="verifying">Verifying Payment...</h1>
+    <h1 class="ps-title" *ngIf="!verified && !verifying">Verification Failed</h1>
+    
+    <p class="ps-subtitle" *ngIf="verified">Your token advance has been verified and processed successfully.</p>
+    <p class="ps-subtitle" *ngIf="verifying">Please wait while we confirm your transaction with Razorpay.</p>
+    <p class="ps-subtitle" *ngIf="!verified && !verifying">We couldn't confirm your transaction. If money was debited, contact support.</p>
+    
+    <div class="ps-receipt-card">
+      <div class="ps-receipt-header">
+        <span class="ps-receipt-title">Transaction Receipt</span>
+        <span class="ps-receipt-status">PAID</span>
+      </div>
+      
+      <div class="ps-divider"></div>
+      
+      <div class="ps-receipt-rows">
+        <div class="ps-receipt-row">
+          <span class="ps-label">Booking ID</span>
+          <strong class="ps-val">#{{ bookingId }}</strong>
+        </div>
+        <div class="ps-receipt-row">
+          <span class="ps-label">Payment ID</span>
+          <strong class="ps-val text-truncate">{{ paymentId }}</strong>
+        </div>
+        <div class="ps-receipt-row">
+          <span class="ps-label">Date & Time</span>
+          <strong class="ps-val">{{ dateStr }}</strong>
+        </div>
+        <div class="ps-receipt-row">
+          <span class="ps-label">Payment Method</span>
+          <strong class="ps-val">Razorpay Secure</strong>
+        </div>
+        
+        <div class="ps-divider"></div>
+        
+        <div class="ps-receipt-row ps-amount-row">
+          <span class="ps-label">Amount Paid</span>
+          <strong class="ps-val ps-amount">₹ {{ amount | number }}</strong>
+        </div>
+      </div>
+    </div>
+    
+    <div class="ps-actions">
+      <a routerLink="/buyer-dashboard/bookings" class="ps-btn-primary">Go to My Bookings</a>
+      <a routerLink="/buyer-dashboard/properties" class="ps-btn-secondary">Browse Properties</a>
+    </div>
+  </div>
+</div>

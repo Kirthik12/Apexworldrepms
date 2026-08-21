@@ -1,0 +1,143 @@
+<!-- --- TOP BAR & HEADER NAV --- -->
+  <!-- --- TOP BAR OFFERS SLIDER --- -->
+  <div class="top-bar" id="top-offers-banner" style="background: var(--primary); display: flex; align-items: center; justify-content: center; height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff; transition: all 0.3s ease;">
+    <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+    
+    <div style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <!-- Slide 1 -->
+      <div class="top-offer-slide" routerLink="/buyer-dashboard/property-details" [queryParams]="{id: 'PROP-014'}" style="position: absolute; width: 100%; text-align: center; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: auto; cursor: pointer;">
+        <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+        <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">&#8377; 80 Lakhs</span>
+        <span style="font-weight: 700; color: #a5d6a7;">&#8377; 75 Lakhs</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ── PROFILE HERO BANNER ── -->
+  <div class="pf-hero">
+    <div style="margin-bottom: 24px;">
+      <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: white;">My Profile</h1>
+    </div>
+    <div class="pf-hero-inner">
+      <div class="pf-avatar">{{ initials }}</div>
+      <div class="pf-hero-info">
+        <h1>{{ fullName || 'User Name' }}</h1>
+        <p>{{ profile.email || 'Email Address' }}</p>
+        <div class="pf-hero-badges">
+          <span class="pf-badge pf-badge-green">✔ KYC Verified</span>
+          <span class="pf-badge pf-badge-blue">⭐ Credit Score 785</span>
+          <span class="pf-badge pf-badge-purple">🔐 Secure Account</span>
+        </div>
+      </div>
+      
+      <!-- Theme Toggle -->
+      <div class="pf-theme-toggle">
+        <button (click)="toggleTheme()" class="theme-btn" aria-label="Toggle Dark Mode">
+          <span *ngIf="!isDarkMode()">☀️ Light</span>
+          <span *ngIf="isDarkMode()">🌙 Dark</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROFILE EDIT CORE PANEL ── -->
+  <div class="pf-page-wrapper">
+
+    <!-- LEFT: Static Info Card -->
+    <div class="pf-static-card">
+      <h3>🔒 Account Details</h3>
+      <p class="pf-static-sub">These fields are non-modifiable and set by the system.</p>
+      <div class="pf-static-item">
+        <span class="pf-static-label">Buyer Account ID</span>
+        <span class="pf-static-value">BUYER-{{ profile.id }}</span>
+      </div>
+      <div class="pf-static-item">
+        <span class="pf-static-label">System Role</span>
+        <span class="pf-static-value">{{ profile.role }}</span>
+      </div>
+      <div class="pf-static-item">
+        <span class="pf-static-label">PAN Card KYC</span>
+        <span class="pf-static-value pf-val-green">Verified ✔ Active Escrow Approved</span>
+      </div>
+      <div class="pf-static-item">
+        <span class="pf-static-label">Credit Bureau Score</span>
+        <span class="pf-static-value pf-val-blue">785 (Excellent Rating)</span>
+      </div>
+      <div class="pf-static-item">
+        <span class="pf-static-label">Account Status</span>
+        <span class="pf-static-value pf-val-green">Active</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Editable Form Card -->
+    <div class="pf-edit-card">
+      <div class="pf-edit-header">
+        <h2>Edit Profile</h2>
+        <p>Update your personal information below. Changes are saved instantly.</p>
+      </div>
+
+      <form (ngSubmit)="updateProfile()" class="pf-form" autocomplete="off" #profileForm="ngForm">
+        <div class="pf-form-row">
+          <div class="pf-form-group">
+            <label for="fullname">Full Name <span class="required-star">*</span></label>
+            <div class="pf-input-wrap">
+              <span class="pf-input-icon">👤</span>
+              <input type="text" [(ngModel)]="fullName" name="fullName" class="pf-input" placeholder="Enter full name" required #fullNameCtrl="ngModel" [class.is-invalid-custom]="fullNameCtrl.invalid && (fullNameCtrl.dirty || fullNameCtrl.touched)">
+            </div>
+            <div *ngIf="fullNameCtrl.invalid && (fullNameCtrl.dirty || fullNameCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="pf-form-group">
+            <label for="email">Email Address <span class="required-star">*</span></label>
+            <div class="pf-input-wrap">
+              <span class="pf-input-icon">✉️</span>
+              <input type="email" [(ngModel)]="profile.email" name="email" class="pf-input" placeholder="Enter email address" required #emailCtrl="ngModel" [class.is-invalid-custom]="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)">
+            </div>
+            <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+        </div>
+
+        <div class="pf-form-row">
+          <div class="pf-form-group">
+            <label for="phone">Phone Number <span class="required-star">*</span></label>
+            <div class="pf-input-wrap">
+              <span class="pf-input-icon">📞</span>
+              <input type="tel" [(ngModel)]="profile.phoneNumber" name="phoneNumber" class="pf-input" placeholder="Enter phone number" required #phoneCtrl="ngModel" [class.is-invalid-custom]="phoneCtrl.invalid && (phoneCtrl.dirty || phoneCtrl.touched)">
+            </div>
+            <div *ngIf="phoneCtrl.invalid && (phoneCtrl.dirty || phoneCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="pf-form-group">
+            <label for="city">City / Address</label>
+            <div class="pf-input-wrap">
+              <span class="pf-input-icon">🏙️</span>
+              <input type="text" [(ngModel)]="profile.address" name="address" class="pf-input" placeholder="Enter your city">
+            </div>
+          </div>
+        </div>
+
+        <div class="pf-form-actions">
+          <button type="submit" class="pf-btn-save" [disabled]="profileForm.invalid">
+            <span class="pf-btn-icon">💾</span> Update Profile
+          </button>
+          <button type="button" (click)="openDeleteModal()" class="pf-btn-delete">
+            <span class="pf-btn-icon">🗑️</span> Delete Account
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- ── DELETE CONFIRM MODAL ── -->
+  <div class="pf-modal-overlay" [class.show]="showDeleteModal">
+    <div class="pf-modal">
+      <div class="pf-modal-icon">⚠️</div>
+      <h3>Delete Account</h3>
+      <p>This action is <strong>permanent and irreversible</strong>. All your booking history, wishlist, and profile data will be permanently erased.</p>
+      <div class="pf-modal-warning">Type <strong>DELETE</strong> below to confirm:</div>
+      <input type="text" [(ngModel)]="deleteConfirmText" class="pf-delete-input" placeholder="Type DELETE to confirm">
+      <div class="pf-modal-actions">
+        <button class="pf-modal-cancel-btn" (click)="closeDeleteModal()">Cancel</button>
+        <button class="pf-modal-delete-btn" [disabled]="deleteConfirmText !== 'DELETE'" (click)="confirmDelete()">Delete My Account</button>
+      </div>
+    </div>
+  </div>

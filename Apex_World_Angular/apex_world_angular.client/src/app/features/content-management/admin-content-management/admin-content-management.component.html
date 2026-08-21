@@ -1,0 +1,198 @@
+<app-admin-header 
+  breadcrumb="Content Management" 
+  title="Content Management" 
+  actionButtonText="＋ Add Content" 
+  (actionClick)="openCreateModal()">
+</app-admin-header>
+<div class="cms-container">
+
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper blue-grad">📄</div>
+      <div>
+        <p class="kpi-label">Total Items</p>
+        <h2 class="kpi-value">{{ totalItems }}</h2>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper green-grad">✅</div>
+      <div>
+        <p class="kpi-label">Active Items</p>
+        <h2 class="kpi-value">{{ activeItems }}</h2>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon-wrapper purple-grad">🗂️</div>
+      <div>
+        <p class="kpi-label">Sections</p>
+        <h2 class="kpi-value">{{ totalSections }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search by section, key or value..."
+             [(ngModel)]="searchText" (ngModelChange)="applyFilters()">
+    </div>
+    <select class="filter-select" [(ngModel)]="filterSection" (ngModelChange)="applyFilters()">
+      <option value="">All Sections</option>
+      <option *ngFor="let s of allSections" [value]="s">{{ s }}</option>
+    </select>
+    <select class="filter-select" [(ngModel)]="filterType" (ngModelChange)="applyFilters()">
+      <option value="">All Types</option>
+      <option value="text">Text</option>
+      <option value="html">HTML</option>
+      <option value="image_url">Image URL</option>
+      <option value="json">JSON</option>
+    </select>
+  </div>
+
+  <!-- Content Table — Grouped by Section -->
+  <div *ngIf="filteredItems.length === 0" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h4>No Content Items Found</h4>
+    <p>Add your first content item using the "Add Content" button. Content items control dynamic text and data on the website (banners, FAQs, announcements, etc.).</p>
+    <button class="btn-add" (click)="openCreateModal()">＋ Add First Content</button>
+  </div>
+
+  <div class="agy-table-container" *ngFor="let section of uniqueSections">
+    <div class="agy-table-title">
+      <span class="section-icon">🗂️</span>
+      <span class="section-name">{{ section }}</span>
+      <span class="section-count">({{ getItemsBySection(section).length }} items)</span>
+    </div>
+    <table class="agy-table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of getItemsBySection(section)">
+          <td>
+            <span class="key-badge">{{ item.key }}</span>
+          </td>
+          <td>
+            <ng-container *ngIf="item.contentType === 'image_url'">
+              <img [src]="item.value" class="img-preview" [alt]="item.key"
+                   onerror="this.style.display='none'">
+              <span class="value-text truncate">{{ item.value }}</span>
+            </ng-container>
+            <ng-container *ngIf="item.contentType !== 'image_url'">
+              <span class="value-text truncate" [innerHTML]="item.value"></span>
+            </ng-container>
+          </td>
+          <td>
+            <span class="type-badge" [ngClass]="getContentTypeBadgeClass(item.contentType)">
+              {{ getContentTypeLabel(item.contentType) }}
+            </span>
+          </td>
+          <td>
+            <button class="toggle-btn" (click)="toggleActive(item)"
+                    [ngClass]="item.isActive ? 'toggle-on' : 'toggle-off'"
+                    [title]="item.isActive ? 'Click to Deactivate' : 'Click to Activate'">
+              <span class="toggle-dot"></span>
+            </button>
+          </td>
+          <td class="text-muted">{{ item.createdAt | date:'shortDate' }}</td>
+          <td>
+            <button class="icon-btn edit-btn" (click)="openEditModal(item)" title="Edit">✏️</button>
+            <button class="icon-btn delete-btn" (click)="promptDelete(item.id)" title="Delete">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Create / Edit Modal ─────────────────────────── -->
+<div class="modal-overlay" [class.show]="showModal">
+  <div class="modal-card" style="max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="modal-hdr" style="flex-shrink: 0;">
+      <h3>{{ isEditing ? '✏️ Edit Content Item' : '＋ New Content Item' }}</h3>
+      <button class="modal-close" (click)="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" style="max-height: 60vh; overflow-y: auto; flex: 1;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Section <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="e.g. HomePage"
+                 [(ngModel)]="editForm.section">
+        </div>
+        <div class="form-group">
+          <label>Key <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="e.g. HeroBannerTitle"
+                 [(ngModel)]="editForm.key">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Content Type <span class="req">*</span></label>
+          <select class="form-input" [(ngModel)]="editForm.contentType">
+            <option value="text">Text</option>
+            <option value="html">HTML</option>
+            <option value="image_url">Image URL</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px;">
+          <label style="margin: 0;">Active</label>
+          <button class="toggle-btn" (click)="editForm.isActive = !editForm.isActive"
+                  [ngClass]="editForm.isActive ? 'toggle-on' : 'toggle-off'">
+            <span class="toggle-dot"></span>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Value <span class="req">*</span></label>
+        <textarea class="form-input form-textarea" rows="5"
+                  [placeholder]="editForm.contentType === 'html' ? 'Enter HTML content...' :
+                                 editForm.contentType === 'image_url' ? 'Enter full image URL...' :
+                                 editForm.contentType === 'json' ? 'Enter JSON blob...' :
+                                 'Enter text value...'"
+                  [(ngModel)]="editForm.value"></textarea>
+        <span class="hint" *ngIf="editForm.contentType === 'html'">
+          💡 HTML is supported. Use tags like &lt;b&gt;, &lt;span&gt;, &lt;p&gt;.
+        </span>
+        <span class="hint" *ngIf="editForm.contentType === 'image_url'">
+          💡 Enter the full URL of the image (e.g. https://...).
+        </span>
+        <ng-container *ngIf="editForm.contentType === 'image_url' && editForm.value">
+          <img [src]="editForm.value" class="modal-img-preview" alt="Preview">
+        </ng-container>
+      </div>
+    </div>
+    <div class="modal-footer" style="flex-shrink: 0;">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="saveContent()" [disabled]="isSaving">
+        {{ isSaving ? '⏳ Saving...' : (isEditing ? '💾 Save Changes' : '➕ Create Item') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Confirm Modal ────────────────────────── -->
+<div class="modal-overlay" [class.show]="showDeleteModal">
+  <div class="modal-card modal-sm">
+    <div class="modal-hdr danger-hdr">
+      <div class="danger-icon">⚠️</div>
+      <h3>Delete Content Item</h3>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to permanently delete this content item? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeDeleteModal()">Cancel</button>
+      <button class="btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>

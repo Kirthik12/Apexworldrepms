@@ -1,0 +1,129 @@
+/* Custom style rules for buyer dashboard matching figma mockups design specs */
+
+/* Stretch container elements to full screen width */
+.section-container {
+  max-width: 95% !important;
+  width: 95% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.header-inner {
+  max-width: 95% !important;
+  width: 95% !important;
+}
+
+.footer-inner {
+  max-width: 95% !important;
+  width: 95% !important;
+}
+
+.action-btn {
+  transition: var(--transition);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background-color: var(--accent-light) !important;
+}
+
+.type-card {
+  transition: var(--transition);
+}
+
+.type-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-md);
+}
+
+.sidebar-box {
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.sidebar-box:hover {
+  box-shadow: var(--shadow-md);
+}
+
+#buyer-hero-card {
+  transition: background-image 0.8s ease-in-out;
+  border-radius: 20px !important;
+  margin: 0 24px;
+}
+
+.hero-container {
+  background: transparent !important;
+}
+
+.support-bell {
+  transition: var(--transition);
+  display: inline-block;
+}
+
+.support-bell:hover {
+  transform: scale(1.15) rotate(15deg);
+}
+
+/* Force footer column layout on all screens */
+.footer-inner {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 30px !important;
+}
+
+@media (max-width: 900px) {
+  .footer-inner {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 15px !important;
+  }
+}
+
+.btn-view-all {
+  background-color: transparent;
+  color: var(--secondary-dark);
+  border: 1.5px solid var(--secondary);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.btn-view-all:hover {
+  background-color: var(--secondary);
+  color: var(--primary) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(212, 165, 116, 0.15);
+}
+
+.property-btn {
+  background-color: transparent !important;
+  color: var(--secondary-dark) !important;
+  border: 1.5px solid var(--secondary) !important;
+  padding: 6px 14px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: var(--transition) !important;
+  cursor: pointer !important;
+}
+
+.property-btn:hover {
+  background-color: var(--secondary) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(212, 165, 116, 0.15) !important;
+}
+nav a {
+  text-decoration: none !important;
+}

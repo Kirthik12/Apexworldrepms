@@ -1,0 +1,170 @@
+<app-admin-header breadcrumb="Booking Management" title="Booking Ledger"></app-admin-header>
+
+<div class="bm-content-area">
+  
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card highlight-border-blue">
+      <p class="kpi-label">TOTAL RESERVATIONS</p>
+      <h2 class="kpi-value" id="kpi-total">{{ totalReservations }} Bookings Logs</h2>
+    </div>
+    <div class="kpi-card highlight-border-orange">
+      <p class="kpi-label">PENDING</p>
+      <h2 class="kpi-value" id="kpi-pending">{{ pendingRequests }} Requests</h2>
+    </div>
+    <div class="kpi-card highlight-border-green">
+      <p class="kpi-label">TOTAL REALIZED VALUATION</p>
+      <h2 class="kpi-value" id="kpi-value">{{ totalRealizedValuation }}</h2>
+    </div>
+  </div>
+
+  <!-- Filters Row -->
+  <div class="filter-row">
+    <div class="search-bar" style="width: 350px;">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="bm-table-search" placeholder="Search bookings by reference, property, buyer name...">
+    </div>
+    <div class="filter-dropdowns">
+      <div class="location-badge">📍 Besant Nagar, Chennai</div>
+      <select id="filter-date" class="filter-select">
+        <option value="">Date Range</option>
+        <option value="today">Today</option>
+        <option value="week">This Week</option>
+        <option value="month">This Month</option>
+      </select>
+      <select id="filter-status" class="filter-select">
+        <option value="">Status: All</option>
+        <option value="Pending">Status: Pending</option>
+        <option value="Approved">Status: Approved</option>
+        <option value="Cancelled">Status: Cancelled</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Directory Section -->
+  <div class="directory-section">
+    <div class="agy-table-container">
+      <div class="agy-table-title">Active Booking Requests Moderation Ledger Queue</div>
+      <table class="agy-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="chk-all"></th>
+            <th>Booking ID</th>
+            <th>Ref Code</th>
+            <th>Property</th>
+            <th>Buyer</th>
+            <th>Date</th>
+            <th>Price (INR)</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="booking-list">
+          <!-- Empty State -->
+          <tr *ngIf="bookings.length === 0">
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <p class="empty-state-title">No bookings found</p>
+                <p class="empty-state-desc">Booking records will appear here once created.</p>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngFor="let item of bookings">
+            <td><input type="checkbox"></td>
+            <td>AWB#{{ item.id }}</td>
+            <td>AWB#{{ item.id }}00</td>
+            <td>{{ item.property?.title || 'Unknown Property' }}</td>
+            <td>{{ item.firstName }} {{ item.lastName }}</td>
+            <td>{{ item.createdAt | date:'dd MMM yyyy' }}</td>
+            <td>
+              <ng-container *ngIf="item.property?.price">
+                {{ item.property.price >= 10000000 ? (item.property.price / 10000000 | number:'1.1-2') + ' Cr' : (item.property.price / 100000 | number:'1.1-2') + ' Lac' }}
+              </ng-container>
+              <ng-container *ngIf="!item.property?.price">N/A</ng-container>
+            </td>
+            <td>
+              <span class="status-badge"
+                [class.pending]="item.status === 'PendingAdminApproval'"
+                [class.approved]="item.status === 'Paid' || item.status === 'Approved'"
+                [class.cancelled]="item.status === 'Cancelled'">
+                {{ item.status === 'PendingAdminApproval' ? 'Pending' : (item.status === 'Paid' || item.status === 'Approved' ? 'Approved' : item.status) }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="action-btn action-neutral"
+                *ngIf="item.status === 'Paid' || item.status === 'Approved'"
+                (click)="viewReceipt(item)"
+                title="View Transaction Receipt"
+                aria-label="View Receipt">
+                📄 View Receipt
+              </button>
+              <span *ngIf="item.status !== 'Paid' && item.status !== 'Approved'" style="color:#94a3b8;font-size:0.8rem;">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="agy-table-pagination">
+        <div class="agy-table-pagination-controls">
+          <app-pagination 
+            [currentPage]="pageNumber" 
+            [totalItems]="totalItems" 
+            [pageSize]="pageSize" 
+            (pageChange)="onPageChange($event)">
+          </app-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="bm-modal-overlay" [class.show]="showModal" id="receipt-modal" role="dialog" aria-modal="true" aria-labelledby="receipt-title">
+  <div class="bm-modal-content" style="width: 460px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden;">
+    <!-- Modal Header -->
+    <div class="receipt-modal-header">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="receipt-icon-box">📄</div>
+        <div>
+          <h3 id="receipt-title" style="margin: 0; font-weight: 700; font-size: 1.15rem; color: #fff;">Transaction Receipt</h3>
+          <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.7);">Apex World REPMS</p>
+        </div>
+      </div>
+      <button (click)="closeModal()" class="modal-close-btn" aria-label="Close modal">✕</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div id="receipt-content" class="receipt-modal-body" *ngIf="selectedBooking" style="padding: 24px; overflow-y: auto; flex: 1;">
+      <!-- Property Section -->
+      <div style="padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1.5px dashed #E2E8F0;">
+        <h4 style="margin: 0 0 4px; font-weight: 700; color: #0F1B35; font-size: 1.05rem;">{{ selectedBooking.property?.title || 'Unknown Property' }}</h4>
+        <p style="margin: 0; color: #64748B; font-size: 0.84rem;">📍 {{ selectedBooking.property?.address || 'N/A' }}</p>
+      </div>
+      <!-- Details Grid -->
+      <div style="display: flex; flex-direction: column; gap: 0;">
+        <div class="receipt-row"><span>Booking ID</span><strong>#{{ selectedBooking.id }}</strong></div>
+        <div class="receipt-row"><span>Reference Code</span><strong>AWB#{{ selectedBooking.id }}00</strong></div>
+        <div class="receipt-row"><span>Buyer Name</span><strong>{{ selectedBooking.firstName }} {{ selectedBooking.lastName }}</strong></div>
+        <div class="receipt-row"><span>Email</span><strong>{{ selectedBooking.email || 'N/A' }}</strong></div>
+        <div class="receipt-row"><span>Phone</span><strong>{{ selectedBooking.phoneNumber || 'N/A' }}</strong></div>
+        <div class="receipt-row"><span>Payment Reference</span><strong style="word-break: break-all; text-align: right; max-width: 55%;">{{ selectedBooking.paymentReference || 'N/A' }}</strong></div>
+        <div class="receipt-row"><span>Payment Method</span><strong>{{ selectedBooking.paymentMethod || 'Online' }}</strong></div>
+        <div class="receipt-row receipt-total">
+          <span>Advance Token Paid</span>
+          <strong style="color: #059669;">₹ 10,000</strong>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="receipt-modal-footer">
+      <button (click)="closeModal()" class="action-btn action-secondary">Close</button>
+      <button (click)="downloadReceiptPdf()" class="action-btn action-success" [disabled]="!selectedBooking">
+        ⬇️ Download PDF
+      </button>
+    </div>
+  </div>
+</div>

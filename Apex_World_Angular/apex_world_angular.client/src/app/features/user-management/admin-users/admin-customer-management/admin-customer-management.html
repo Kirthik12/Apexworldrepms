@@ -1,0 +1,138 @@
+<app-admin-header breadcrumb="Customer Management" title="Customer Management"></app-admin-header>
+
+<!-- PAGE CONTENT -->
+<div class="cm-content-area">
+
+  <!-- KPI Row — clickable filter cards -->
+  <div class="kpi-row">
+    <div class="kpi-card highlight-border-blue"
+         [class.kpi-active-filter]="activeFilter === 'all'"
+         (click)="setFilter('all')"
+         title="Show all customers">
+      <p class="kpi-label">TOTAL CUSTOMERS</p>
+      <h2 class="kpi-value" id="kpi-total">{{ totalCustomers }} Registered</h2>
+      <span class="kpi-filter-hint" *ngIf="activeFilter === 'all'">● Showing all</span>
+    </div>
+    <div class="kpi-card highlight-border-green"
+         [class.kpi-active-filter]="activeFilter === 'active'"
+         (click)="setFilter('active')"
+         title="Show only active customers">
+      <p class="kpi-label">ACTIVE ACCOUNTS</p>
+      <h2 class="kpi-value" id="kpi-active">{{ activeCustomers }} Active</h2>
+      <span class="kpi-filter-hint" *ngIf="activeFilter === 'active'">● Filtered</span>
+    </div>
+    <div class="kpi-card highlight-border-orange"
+         [class.kpi-active-filter]="activeFilter === 'inactive'"
+         (click)="setFilter('inactive')"
+         title="Show only inactive customers">
+      <p class="kpi-label">INACTIVE ACCOUNTS</p>
+      <h2 class="kpi-value" id="kpi-inactive">{{ inactiveCustomers }} Inactive</h2>
+      <span class="kpi-filter-hint" *ngIf="activeFilter === 'inactive'">● Filtered</span>
+    </div>
+  </div>
+
+  <!-- Search Bar (no dropdown) -->
+  <div class="filter-row">
+    <div class="cm-search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="cm-table-search" placeholder="Search by name, email or phone...">
+    </div>
+  </div>
+
+  <!-- Directory Section -->
+  <div class="agy-table-container">
+    <div class="agy-table-title">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <span style="margin: 0;">Registered Buyer Directory</span>
+        <span class="filter-badge" *ngIf="activeFilter !== 'all'">
+          {{ activeFilter === 'active' ? 'Active only' : 'Inactive only' }}
+          <button class="filter-clear" (click)="setFilter('all')" title="Clear filter">✕</button>
+        </span>
+      </div>
+    </div>
+
+    <!-- Proper Table -->
+    <table class="agy-table">
+      <thead>
+        <tr>
+          <th>Customer Name</th>
+          <th>Email Address</th>
+          <th>Location</th>
+          <th>Phone Number</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="customers.length === 0">
+          <td colspan="6" style="padding:0; border:none;">
+            <div class="empty-state" style="margin: 32px 0;">
+              <div class="empty-state-icon">👥</div>
+              <p class="empty-state-title">No customers found</p>
+              <p class="empty-state-desc">Customer records will appear here once registered.</p>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let cust of customers">
+          <td>
+            <strong>{{ cust.fullName || cust.username }}</strong>
+          </td>
+          <td>{{ cust.email }}</td>
+          <td>{{ cust.city || '—' }}</td>
+          <td>{{ cust.phoneNumber || 'N/A' }}</td>
+          <td>
+            <span class="status-badge" [class.approved]="cust.isActive" [class.cancelled]="!cust.isActive">
+              {{ cust.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <label class="toggle-switch">
+              <input type="checkbox" [checked]="cust.isActive" (click)="onToggleClick($event, cust)">
+              <span class="slider"></span>
+            </label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="agy-table-pagination">
+      <div class="agy-table-pagination-controls">
+        <app-pagination
+          [currentPage]="pageNumber"
+          [totalItems]="totalCount"
+          [pageSize]="pageSize"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== CONFIRMATION MODAL ===================== -->
+<div class="bm-modal-overlay" [class.show]="showConfirmModal" (click)="cancelDeactivation()" id="deactivate-modal" role="dialog" aria-modal="true" aria-labelledby="deactivate-modal-title">
+  <div class="bm-modal-content" style="width: 440px; border-radius: 16px; overflow: hidden;" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #B45309 0%, #D97706 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">⚠️</span>
+        <h3 id="deactivate-modal-title" style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Confirm Deactivation</h3>
+      </div>
+      <button (click)="cancelDeactivation()" class="modal-close-btn" aria-label="Close modal">✕</button>
+    </div>
+    <!-- Body -->
+    <div style="padding: 24px; font-size: 0.95rem; color: #334155;">
+      <p style="margin: 0; line-height: 1.6;">
+        Are you sure you want to deactivate
+        <strong>{{ pendingToggleUser?.fullName || pendingToggleUser?.username }}</strong>?
+        They will not be able to log in until reactivated.
+      </p>
+    </div>
+    <!-- Footer -->
+    <div class="receipt-modal-footer">
+      <button (click)="cancelDeactivation()" class="action-btn action-secondary">Cancel</button>
+      <button (click)="confirmDeactivation()" class="action-btn action-reject">Yes, Deactivate</button>
+    </div>
+  </div>
+</div>

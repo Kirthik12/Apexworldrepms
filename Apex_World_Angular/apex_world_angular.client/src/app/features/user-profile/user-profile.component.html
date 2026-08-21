@@ -1,0 +1,42 @@
+<app-admin-header breadcrumb="Dashboard" title="My Profile"></app-admin-header>
+
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="avatar-container">
+        <div id="admin-initials-display" class="avatar">{{ initials }}</div>
+        <div class="role-badge">Super Admin</div>
+      </div>
+      <div class="profile-info">
+        <h3 id="admin-name-display">{{ profile.name }}</h3>
+        <p id="admin-email-display">{{ profile.email }}</p>
+      </div>
+    </div>
+    
+    <form id="admin-profile-form" (ngSubmit)="saveChanges()" #profileForm="ngForm">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name <span class="required-star">*</span></label>
+          <input type="text" name="name" [(ngModel)]="profile.name" #nameModel="ngModel" required [class.is-invalid-custom]="nameModel.invalid && (nameModel.dirty || nameModel.touched)" class="form-input">
+          <div *ngIf="nameModel.invalid && (nameModel.dirty || nameModel.touched)" class="invalid-feedback-custom">Field is required</div>
+        </div>
+        
+        <div class="form-group">
+          <label>Email Address <span class="read-only-badge">Read Only</span></label>
+          <input type="email" name="email" [(ngModel)]="profile.email" readonly class="form-input read-only" title="Email address cannot be changed">
+        </div>
+        
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label>Phone Number <span class="required-star">*</span></label>
+          <input type="text" name="phone" [(ngModel)]="profile.phone" #phoneModel="ngModel" required [class.is-invalid-custom]="phoneModel.invalid && (phoneModel.dirty || phoneModel.touched)" class="form-input">
+          <div *ngIf="phoneModel.invalid && (phoneModel.dirty || phoneModel.touched)" class="invalid-feedback-custom">Field is required</div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" id="clear-btn" (click)="clearFields()" class="btn btn-secondary">Clear Fields</button>
+        <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>

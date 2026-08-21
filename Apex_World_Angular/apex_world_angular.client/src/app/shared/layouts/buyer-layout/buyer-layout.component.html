@@ -1,0 +1,62 @@
+<!-- --- TOP BAR OFFERS SLIDER --- -->
+<div class="top-bar" id="top-offers-banner" style="background: var(--primary); display: flex; align-items: center; justify-content: center; height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff; transition: all 0.3s ease;">
+  <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+  
+  <div style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+    <!-- Slide 1 -->
+    <div class="top-offer-slide" style="position: absolute; width: 100%; text-align: center; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none;">
+      <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+      <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">&#8377; 80 Lakhs</span>
+      <span style="font-weight: 700; color: #a5d6a7;">&#8377; 75 Lakhs</span>
+    </div>
+    <!-- Slide 2 -->
+    <div class="top-offer-slide" style="position: absolute; width: 100%; text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out; pointer-events: none;">
+      <span style="font-weight: 700; color: #fff;">Lake Villa Retreat - </span>
+      <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">&#8377; 1.25 Cr</span>
+      <span style="font-weight: 700; color: #a5d6a7;">&#8377; 1.00 Cr</span>
+    </div>
+    <!-- Slide 3 -->
+    <div class="top-offer-slide" style="position: absolute; width: 100%; text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out; pointer-events: none;">
+      <span style="font-weight: 700; color: #fff;">City Heights Apt :</span>
+      <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">&#8377; 1.95 Cr</span>
+      <span style="font-weight: 700; color: #a5d6a7;">&#8377; 1.65 Cr</span>
+    </div>
+  </div>
+
+  <button style="position: absolute; right: 16px; background: transparent; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; line-height: 1; padding: 0 4px; display: flex; align-items: center; justify-content: center; font-weight: 700;">&times;</button>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a routerLink="/" class="logo">
+      <div class="logo-badge"><img src="/assets/images/logo.png" alt="Apex World Brand Logo"></div>
+      APEX <span>WORLD</span>
+    </a>
+    <nav>
+      <a routerLink="/buyer-dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/buyer-dashboard/properties" routerLinkActive="active">Property Explorer</a>
+      <a routerLink="/buyer-dashboard/wishlist" routerLinkActive="active" id="nav-wishlist-link">My Wishlist</a>
+      <a routerLink="/buyer-dashboard/bookings" routerLinkActive="active">Reservation Desk</a>
+      <a routerLink="/buyer-dashboard/loans" routerLinkActive="active">EMI Calculator</a>
+      <a routerLink="/buyer-dashboard/reviews" routerLinkActive="active">Review Lounge</a>
+    </nav>
+    <div class="header-actions" style="display: flex; align-items: center; gap: 16px;">
+      <app-notification-bell></app-notification-bell>
+      <a routerLink="/buyer-dashboard/help-center" class="help-center-icon" style="font-size: 1.2rem; cursor: pointer; color: var(--primary); text-decoration: none; margin-left: 12px;" title="Help Center">?</a>
+      <div class="user-dropdown">
+        <button class="user-dropdown-btn" (click)="toggleDropdown($event)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#4B3B73"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> <span class="nav-user-name">{{ displayName }}</span>
+        </button>
+        <div class="user-dropdown-menu" id="userDropdownMenu" [class.show]="isUserDropdownOpen">
+          <a routerLink="/buyer-dashboard/profile" (click)="isUserDropdownOpen = false">My Profile</a>
+          <a routerLink="/buyer-dashboard/reset-password" (click)="isUserDropdownOpen = false">Change Password</a>
+          <a href="javascript:void(0)" (click)="logout()">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="buyer-main">
+  <router-outlet></router-outlet>
+</main>

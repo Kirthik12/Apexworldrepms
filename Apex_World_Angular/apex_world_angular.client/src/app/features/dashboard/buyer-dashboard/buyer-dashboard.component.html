@@ -1,0 +1,202 @@
+<!-- --- TOP BAR OFFERS SLIDER --- -->
+  <div class="top-bar" id="top-offers-banner" style="background: var(--primary); display: flex; align-items: center; justify-content: center; height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff; transition: all 0.3s ease;">
+    <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+    
+    <div style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <!-- Slide 1 -->
+      <div class="top-offer-slide" routerLink="/buyer-dashboard/property-details" [queryParams]="{id: '14'}" style="position: absolute; width: 100%; text-align: center; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: auto; cursor: pointer;">
+        <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+        <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">₹ 80 Lakhs</span>
+        <span style="font-weight: 700; color: #a5d6a7;">₹ 75 Lakhs</span>
+      </div>
+    </div>
+
+    <button (click)="dismissTopBanner()" style="position: absolute; right: 16px; background: transparent; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; line-height: 1; padding: 0 4px; display: flex; align-items: center; justify-content: center; font-weight: 700;">&times;</button>
+  </div>
+
+  <!-- --- HERO SECTION --- -->
+  <div class="hero-container">
+    <div class="hero-card" id="buyer-hero-card" style="position: relative; overflow: hidden; border-radius: 20px; min-height: 500px; display: flex; align-items: center; padding: 60px;">
+      
+      <!-- Luxury Local Video Background -->
+      <video autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.6);" poster="../../../assets/images/buyer_slide1.png">
+        <source src="../../../assets/videos/hero_background.mp4" type="video/mp4">
+      </video>
+
+      <!-- Hero Content Overlay -->
+      <div class="hero-content-glass" style="position: relative; z-index: 2; color: white; background: rgba(10, 22, 40, 0.4); backdrop-filter: blur(8px); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.15); max-width: 700px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <div class="hero-tag" style="display: inline-block; background: linear-gradient(135deg, rgba(244,130,37,0.8), rgba(244,130,37,0.4)); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 30px; color: white; font-weight: 700; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; border: 1px solid rgba(244,130,37,0.5);">✨ Premium Real Estate Experience</div>
+        <h1 style="font-size: 3.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; letter-spacing: -1px;">Find Your <span style="color: var(--secondary);">Dream</span> Property</h1>
+        <p style="font-size: 1.15rem; margin-bottom: 32px; opacity: 0.95; line-height: 1.6;">Explore highly vetted, luxury properties in Chennai that match your elite lifestyle and budget.</p>
+        <div style="display: flex; gap: 16px;">
+          <a routerLink="/buyer-dashboard/properties" class="bk-btn-primary" style="text-decoration: none; padding: 14px 28px; font-size: 1.05rem;">Explore Properties</a>
+          <a routerLink="/buyer-dashboard/bookings" class="bk-btn-secondary" style="text-decoration: none; padding: 14px 28px; font-size: 1.05rem;">Book a Tour</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- --- BUYER MAIN CONTENT SPLIT LAYOUT --- -->
+  <div class="section-container" style="margin-top: 80px; display: grid; grid-template-columns: 3fr 1fr; gap: 40px;">
+    
+    <!-- LEFT SIDE: RECOMMENDED & EXPLORE -->
+    <div>
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+          <h2 style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin: 0;">Recommended Properties</h2>
+          <p style="color: var(--text-muted); margin: 4px 0 0;">Handpicked properties just for you</p>
+        </div>
+        <a routerLink="/buyer-dashboard/properties" class="btn-view-all">View All &rarr;</a>
+      </div>
+      
+      <div class="grid-properties" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; margin-bottom: 48px;">
+        <div *ngIf="recommendedProperties.length === 0" style="padding: 20px; color: var(--text-muted);">
+          No available properties right now.
+        </div>
+        <div class="property-card" *ngFor="let prop of recommendedProperties">
+          <div class="property-image-wrapper">
+            <img [src]="getImageUrl(prop.images)" [alt]="prop.title">
+            <div class="property-tag" style="background-color: var(--accent);">{{ prop.category?.name || 'Featured' }}</div>
+          </div>
+          <div class="property-content">
+            <h3 class="property-title" style="font-size: 1.1rem; font-weight: 700; margin: 0 0 4px;">{{ prop.title }}</h3>
+            <div class="property-location" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">📍  {{ prop.address }}</div>
+            <div class="property-footer">
+              <div class="property-price" style="color: var(--accent-dark); font-weight: 800; font-size: 1.1rem;">₹ {{ prop.price }}</div>
+              <a routerLink="/buyer-dashboard/property-details" [queryParams]="{id: prop.id}" class="property-btn">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: QUICK ACTIONS & SEARCHES -->
+    <div>
+      <div class="sidebar-box modern-quick-actions" style="background: var(--bg-white); padding: 24px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 24px;">
+        <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><span style="color: var(--secondary);">⚡</span> Quick Actions</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <a routerLink="/buyer-dashboard/wishlist" class="action-card-modern">
+            <div class="ac-icon" style="background: rgba(239, 68, 68, 0.1); color: #EF4444;">❤️</div>
+            <div class="ac-text">My Wishlist</div>
+          </a>
+          <a routerLink="/buyer-dashboard/bookings" class="action-card-modern">
+            <div class="ac-icon" style="background: rgba(59, 130, 246, 0.1); color: #3B82F6;">📅</div>
+            <div class="ac-text">Reservations</div>
+          </a>
+          <a routerLink="/buyer-dashboard/loans" class="action-card-modern">
+            <div class="ac-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">💰</div>
+            <div class="ac-text">EMI Calc</div>
+          </a>
+          <a routerLink="/buyer-dashboard/reviews" class="action-card-modern">
+            <div class="ac-icon" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">⭐</div>
+            <div class="ac-text">Reviews</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION FOR RECENTLY VIEWED (Full Width) -->
+  <div class="section-container" style="margin-top: 40px; margin-bottom: 40px;">
+      <div id="recently-viewed-section" style="margin-bottom: 48px;">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin: 0;">Recently Viewed</h2>
+            <p style="color: var(--text-muted); margin: 4px 0 0;">Properties you recently explored</p>
+          </div>
+          <a routerLink="/buyer-dashboard/properties" class="btn-view-all">View All &rarr;</a>
+        </div>
+
+        <div style="position: relative; width: 100%; display: flex; align-items: center;">
+          <button (click)="scrollRecentlyViewed(-1)" style="position: absolute; left: -20px; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; transition: all 0.2s; z-index: 10; color: var(--primary); outline: none;">←</button>
+          
+          <div id="recently-viewed-track" style="display: flex; gap: 24px; overflow-x: auto; scroll-behavior: smooth; width: 100%; padding: 12px 4px; box-sizing: border-box; -ms-overflow-style: none; scrollbar-width: none;">
+            
+            <p *ngIf="recentlyViewed.length === 0" style="flex: 1; color: var(--text-muted); font-size: 1.1rem; text-align: center; padding: 40px; background: var(--bg-white); border-radius: 12px; border: 1px dashed var(--border); margin: 0;">You haven't viewed any properties recently. Explore our properties directory and they will appear here!</p>
+
+            <div class="property-card" *ngFor="let prop of recentlyViewed" style="flex: 0 0 calc((100% - 72px) / 4.5); width: calc((100% - 72px) / 4.5); min-width: 200px; box-sizing: border-box; cursor: default; margin: 4px 0;">
+              <div class="property-image-wrapper">
+                <img [src]="getImageUrl(prop.images)" [alt]="prop.title">
+                <div class="property-tag" style="background-color: var(--accent);">{{ prop.category?.name || 'Featured' }}</div>
+              </div>
+              <div class="property-content">
+                <h3 class="property-title" style="font-size: 1.1rem; font-weight: 700; margin: 0 0 4px;">{{ prop.title }}</h3>
+                <div class="property-location" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">&#128205; {{ prop.address || 'Location Not Specified' }}</div>
+                <div class="property-footer">
+                  <div class="property-price" style="color: var(--accent-dark); font-weight: 800; font-size: 1.1rem;">&#8377; {{ prop.price || 'Price on Request' }}</div>
+                  <button [routerLink]="['/buyer-dashboard/property-details']" [queryParams]="{id: prop.id}" class="property-btn" style="border:none; cursor:pointer;">View Details</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <button (click)="scrollRecentlyViewed(1)" style="position: absolute; right: -20px; width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; transition: all 0.2s; z-index: 10; color: var(--primary); outline: none;">→</button>
+        </div>
+      </div>
+
+      <style>
+        #recently-viewed-track::-webkit-scrollbar {
+          display: none; 
+        }
+      </style>
+    </div>
+
+  <!-- SECTION FOR EXPLORE BY TYPE & FEATURES -->
+  <div class="section-container" style="margin-top: 40px; margin-bottom: 40px;">
+      <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 20px;">Explore by Property Type</h3>
+      <div class="grid-types" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px;">
+        <div class="type-card" routerLink="/buyer-dashboard/properties" [queryParams]="{category: 'Villa'}" style="display: flex; align-items: center; gap: 12px; background: var(--bg-white); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition);">
+          <span style="font-size: 1.8rem;">&#127968;</span>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--primary);">Villas</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Luxury Living</div>
+          </div>
+        </div>
+        <div class="type-card" routerLink="/buyer-dashboard/properties" [queryParams]="{category: 'Apartment'}" style="display: flex; align-items: center; gap: 12px; background: var(--bg-white); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition);">
+          <span style="font-size: 1.8rem;">&#127970;</span>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--primary);">Apartments</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Modern Lifestyle</div>
+          </div>
+        </div>
+        <div class="type-card" routerLink="/buyer-dashboard/properties" [queryParams]="{category: 'Plot'}" style="display: flex; align-items: center; gap: 12px; background: var(--bg-white); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition);">
+          <span style="font-size: 1.8rem;">&#128506;&#65039;</span>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--primary);">Residential Plots</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Build your Dream</div>
+          </div>
+        </div>
+        <div class="type-card" routerLink="/buyer-dashboard/properties" [queryParams]="{category: 'Commercial'}" style="display: flex; align-items: center; gap: 12px; background: var(--bg-white); padding: 16px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; transition: var(--transition);">
+          <span style="font-size: 1.8rem;">&#127981;</span>
+          <div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--primary);">Commercial</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Grow Business</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEATURES RIBBON -->
+      <div class="features-ribbon" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; background: var(--bg-white); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 40px;">
+        <div style="text-align: center;">
+          <span style="font-size: 1.5rem;">&#128304;</span>
+          <div style="font-weight: 700; font-size: 0.8rem; margin-top: 4px; color: var(--primary);">100% Verified</div>
+        </div>
+        <div style="text-align: center;">
+          <span style="font-size: 1.5rem;">&#128176;</span>
+          <div style="font-weight: 700; font-size: 0.8rem; margin-top: 4px; color: var(--primary);">Best Price</div>
+        </div>
+        <div style="text-align: center;">
+          <span style="font-size: 1.5rem;">&#128197;</span>
+          <div style="font-weight: 700; font-size: 0.8rem; margin-top: 4px; color: var(--primary);">Easy Booking</div>
+        </div>
+        <div style="text-align: center;">
+          <span style="font-size: 1.5rem;">&#128274;</span>
+          <div style="font-weight: 700; font-size: 0.8rem; margin-top: 4px; color: var(--primary);">Secure Escrow</div>
+        </div>
+        <div style="text-align: center;">
+          <span style="font-size: 1.5rem;">&#128222;</span>
+          <div style="font-weight: 700; font-size: 0.8rem; margin-top: 4px; color: var(--primary);">24/7 Support</div>
+        </div>
+      </div>
+    </div>

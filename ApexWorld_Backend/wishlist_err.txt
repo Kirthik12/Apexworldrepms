@@ -1,0 +1,20 @@
+Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'PropertyId'.
+Invalid column name 'PropertyId'.
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.InitializeReaderAsync(AsyncEnumerator enumerator, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal.SqlServerExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Query.Internal.SingleQueryingEnumerable`1.AsyncEnumerator.MoveNextAsync()
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync[TSource](IQueryable`1 source, CancellationToken cancellationToken)
+   at ApexWorld_Backend.Data.Repositories.Repository`1.GetAsync(Expression`1 predicate, String includeProperties) in C:\Users\kirth\source\repos\ApexWorld_Backend\ApexWorld_Backend\Data\Repositories\Repository.cs:line 40
+   at ApexWorld_Backend.Features.Wishlist.Services.WishlistService.GetWishlistPropertiesAsync(String buyerIdStr) in C:\Users\kirth\source\repos\ApexWorld_Backend\ApexWorld_Backend\Features\Wishlist\Services\WishlistService.cs:line 30
+   at ApexWorld_Backend.Modules.Wishlist.Controllers.WishlistController.GetWishlistProperties() in C:\Users\kirth\source\repos\ApexWorld_Backend\ApexWorld_Backend\Features\Wishlist\Controller\WishlistController.cs:line 38
+ClientConnectionId:16f7773a-f384-4f6e-9207-6af43052097c
+Error Number:207,State:1,Class:16

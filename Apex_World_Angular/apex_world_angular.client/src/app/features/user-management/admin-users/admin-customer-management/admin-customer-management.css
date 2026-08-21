@@ -1,0 +1,817 @@
+/* =====================================================================
+   SIDEBAR â€” Standardized (matches admin_dashboard.css)
+===================================================================== */
+.admin-sidebar {
+  width: 280px;
+  background-color: #1A365D;
+  color: #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+  transition: width 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.sidebar-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-title .brand {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.sidebar-title .sub-brand {
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+.sidebar-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 0;
+}
+
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  color: #E2E8F0;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.nav-item .icon {
+  margin-right: 12px;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.nav-item:hover {
+  background-color: #2C5282;
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-item.active {
+  background-color: #2B6CB0;
+  color: #fff;
+  border-left-color: #60A5FA;
+}
+
+.nav-item.active .icon { opacity: 1; }
+
+.sidebar-footer {
+  padding: 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+
+.logout-btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  color: #FCA5A5;
+  justify-content: center;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #FECACA;
+}
+
+/* =====================================================================
+   LAYOUT
+===================================================================== */
+:root {
+  --bg: #F8FAFC;
+  --text: #1E293B;
+  --muted: #64748B;
+  --border: #E2E8F0;
+  --primary: #2563EB;
+  --card: #FFFFFF;
+  --success: #10B981;
+  --danger: #EF4444;
+  --orange: #F59E0B;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* =====================================================================
+   MAIN CONTENT
+===================================================================== */
+.admin-main {
+  flex: 1;
+  margin-left: 280px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+}
+
+/* =====================================================================
+   TOP HEADER â€” matches Booking Management exactly
+===================================================================== */
+.admin-top-header {
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--border);
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.top-header-tier1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.breadcrumb .highlight {
+  color: #1E3A8A;
+  font-weight: 700;
+}
+
+.tier1-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.top-search-bar {
+  display: flex;
+  align-items: center;
+  background: #F1F5F9;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  width: 300px;
+}
+
+.top-search-bar .icon {
+  font-size: 14px;
+  color: #3B82F6;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.top-search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.top-search-bar input::placeholder { color: #94A3B8; }
+
+.top-header-tier2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  background: #FAFAFA;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1E3A8A;
+  letter-spacing: -0.5px;
+}
+
+/* =====================================================================
+   CONTENT AREA â€” matches .bm-content-area exactly
+===================================================================== */
+.cm-content-area {
+  padding: 32px;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* =====================================================================
+   KPI ROW â€” identical to Booking Management
+===================================================================== */
+.kpi-row { width: 100%;
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.kpi-card {
+  flex: 1;
+  background: var(--card);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  user-select: none;
+}
+
+.kpi-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.kpi-card.highlight-border-blue  { border-left: 4px solid var(--primary); }
+.kpi-card.highlight-border-green  { border-left: 4px solid var(--success); }
+.kpi-card.highlight-border-orange { border-left: 4px solid var(--orange); }
+
+/* Active filter state — card looks selected */
+.kpi-card.kpi-active-filter {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+.kpi-card.highlight-border-blue.kpi-active-filter   { background: #EFF6FF; }
+.kpi-card.highlight-border-green.kpi-active-filter  { background: #F0FDF4; }
+.kpi-card.highlight-border-orange.kpi-active-filter { background: #FFFBEB; }
+
+.kpi-filter-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748B;
+  letter-spacing: 0.02em;
+}
+
+.kpi-label {
+  margin: 0 0 8px 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+h2.kpi-value { font-size: 1.4rem !important;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1E3A8A;
+}
+
+/* =====================================================================
+   FILTER ROW â€” matches Booking Management
+===================================================================== */
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.cm-search-bar {
+  display: flex;
+  align-items: center;
+  background: #F1F5F9;
+  border-radius: 8px;
+  padding: 8px 14px;
+  width: 350px;
+  border: 1px solid var(--border);
+}
+
+.search-icon {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-right: 8px;
+}
+
+.cm-search-bar input {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 0.85rem;
+  width: 100%;
+  color: var(--text);
+}
+
+.cm-search-bar input::placeholder { color: #94A3B8; }
+
+.filter-dropdowns {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #FFFFFF;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* =====================================================================
+   DIRECTORY SECTION â€” matches Booking Management exactly
+===================================================================== */
+.directory-section {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.section-title {
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1E3A8A;
+}
+
+/* =====================================================================
+   CUSTOM TABLE HEADER (flex-based like bm-table-header)
+===================================================================== */
+.cm-table-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 12px 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.cm-col-name   { width: 200px; flex-shrink: 0; }
+.cm-col-email  { flex: 1; min-width: 0; }
+.cm-col-phone  { width: 150px; flex-shrink: 0; }
+.cm-col-status { width: 120px; flex-shrink: 0; }
+.cm-col-action { width: 110px; flex-shrink: 0; }
+
+/* =====================================================================
+   TABLE â€” styled to match the Booking Management rows
+===================================================================== */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.cust-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+/* Hide the real thead â€” we use our custom .cm-table-header above */
+.cust-table thead { display: none; }
+
+.cust-table tbody tr {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cust-table tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.cust-table td {
+  padding: 14px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  vertical-align: middle;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+/* First cell â€” left border radius */
+.cust-table td:first-child {
+  border-left: 1px solid var(--border);
+  border-radius: 8px 0 0 8px;
+  font-weight: 700;
+  color: #1E3A8A;
+}
+
+/* Last cell â€” right border radius */
+.cust-table td:last-child {
+  border-right: 1px solid var(--border);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Column widths matching cm-table-header */
+.cust-table td:nth-child(1) { width: 200px; }
+.cust-table td:nth-child(2) { }
+.cust-table td:nth-child(3) { width: 150px; color: var(--muted); }
+.cust-table td:nth-child(4) { width: 120px; }
+.cust-table td:nth-child(5) { width: 110px; }
+
+/* =====================================================================
+   STATUS BADGES â€” matches Booking Management badge style
+===================================================================== */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status-badge.active {
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #D1FAE5;
+}
+
+.status-badge.inactive {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FEE2E2;
+}
+
+/* =====================================================================
+   TOGGLE SWITCH â€” preserved from original, styled cleanly
+===================================================================== */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background-color: #CBD5E1;
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .slider { background-color: #10B981; }
+.toggle-switch input:checked + .slider::before { transform: translateX(20px); }
+
+/* =====================================================================
+   PAGINATION â€” matches bm-pagination
+===================================================================== */
+.bm-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.cm-pagination-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 600;
+  border: none;
+  padding: 0;
+}
+
+.page-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.page-link-btn:hover { background: #EFF6FF; }
+.page-link-btn.active { color: #1E3A8A; text-decoration: underline; }
+
+/* =====================================================================
+   CONFIRMATION MODAL
+===================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modal-box h3 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.modal-box p {
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.modal-icon-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  margin: 0 0 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1E293B;
+  text-align: center;
+}
+
+.modal-desc {
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+  color: #64748B;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-outline {
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btn-outline:hover { background: #F1F5F9; }
+
+.btn-danger {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btn-danger:hover { background: #DC2626; }
+
+/* =====================================================================
+   TOAST NOTIFICATION
+===================================================================== */
+
+/* =====================================================================
+   DARK MODE SUPPORT
+===================================================================== */
+.dark-mode {
+  background-color: #0F172A;
+  color: #E2E8F0;
+}
+
+.dark-mode .admin-top-header,
+.dark-mode .directory-section,
+.dark-mode .kpi-card,
+.dark-mode .cust-table tbody tr {
+  background-color: #1E293B;
+  border-color: #334155;
+}
+
+.dark-mode .top-header-tier2 { background: #1E293B; }
+.dark-mode .page-title { color: #93C5FD; }
+.dark-mode h2.kpi-value { font-size: 1.4rem !important; color: #93C5FD; }
+.dark-mode .cust-table td:first-child { color: #93C5FD; }
+
+/* =====================================================================
+   PROPER TABLE STYLES
+===================================================================== */
+.cm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  color: #1E293B;
+}
+
+.cm-th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748B;
+  border-bottom: 1px solid #E2E8F0;
+  background: #fff;
+  white-space: nowrap;
+}
+
+.cm-td {
+  padding: 14px 16px;
+  vertical-align: middle;
+  border-bottom: 1px solid #F1F5F9;
+  color: #334155;
+  font-size: 0.875rem;
+}
+
+.cm-td-name {
+  color: #1E293B;
+  font-weight: 600;
+}
+
+.cm-row:hover {
+  background-color: #F8FAFC;
+  transition: background-color 0.15s ease;
+}
+
+.cm-empty {
+  text-align: center;
+  padding: 40px;
+  color: #94A3B8;
+  font-size: 0.9rem;
+}
+
+/* Override old bm-pagination to use flex row */
+.bm-pagination {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-top: 1.25rem !important;
+  padding: 0 4px;
+  font-size: 0.85rem;
+  color: #64748B;
+}
+
+.pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #1E293B;
+}
+
+/* =====================================================================
+   SECTION TITLE ROW + FILTER BADGE
+===================================================================== */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-title-row .section-title {
+  margin: 0;
+}
+
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 12px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1D4ED8;
+}
+
+.filter-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #6B7280;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.filter-clear:hover { color: #EF4444; }

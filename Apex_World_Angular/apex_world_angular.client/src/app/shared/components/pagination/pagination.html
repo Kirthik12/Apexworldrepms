@@ -1,0 +1,45 @@
+<div class="app-pagination-container" *ngIf="totalItems > 0">
+  <div class="pagination-summary">
+    Showing <strong>{{ showSummaryStart }}</strong> to <strong>{{ showSummaryEnd }}</strong> of <strong>{{ totalItems }}</strong> entries
+  </div>
+  <nav class="pagination-nav" aria-label="Pagination Navigation">
+    <!-- Prev Button -->
+    <button 
+      class="pagination-arrow-btn prev-btn" 
+      [disabled]="currentPage === 1 || disabled" 
+      (click)="onPageChange(currentPage - 1)" 
+      aria-label="Previous Page">
+      <span class="desktop-text">← Previous</span>
+      <span class="mobile-text">←</span>
+    </button>
+
+    <!-- Page Buttons -->
+    <div class="pagination-page-list">
+      <ng-container *ngFor="let page of pages">
+        <button 
+          *ngIf="page !== '...'; else ellipsis"
+          class="pagination-number-btn" 
+          [class.active]="page === currentPage" 
+          [disabled]="disabled"
+          (click)="onPageChange(page)" 
+          [attr.aria-label]="'Page ' + page" 
+          [attr.aria-current]="page === currentPage ? 'page' : null">
+          {{ page }}
+        </button>
+        <ng-template #ellipsis>
+          <span class="pagination-ellipsis" aria-hidden="true">...</span>
+        </ng-template>
+      </ng-container>
+    </div>
+
+    <!-- Next Button -->
+    <button 
+      class="pagination-arrow-btn next-btn" 
+      [disabled]="currentPage === totalPages || disabled" 
+      (click)="onPageChange(currentPage + 1)" 
+      aria-label="Next Page">
+      <span class="desktop-text">Next →</span>
+      <span class="mobile-text">→</span>
+    </button>
+  </nav>
+</div>

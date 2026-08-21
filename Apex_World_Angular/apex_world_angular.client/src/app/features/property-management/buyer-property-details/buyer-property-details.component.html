@@ -1,0 +1,127 @@
+<div class="top-bar" id="top-offers-banner" style="background: var(--primary); display: flex; align-items: center; justify-content: center; height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff; transition: all 0.3s ease;">
+  <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+  <div style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+    <div class="top-offer-slide" routerLink="/buyer-dashboard/property-details" [queryParams]="{id: '14'}" style="position: absolute; width: 100%; text-align: center; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: auto; cursor: pointer;">
+      <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+      <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">₹ 80 Lakhs</span>
+      <span style="font-weight: 700; color: #a5d6a7;">₹ 75 Lakhs</span>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 15px 4%; display: flex; justify-content: flex-start; max-width: 95%; margin: 0 auto;">
+  <a (click)="goBack()" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 600; text-decoration: none; color: var(--primary); background: transparent; border: 1.5px solid var(--primary); padding: 6px 16px; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='var(--primary)';">
+    <span style="font-size: 1.1rem; line-height: 1;">&larr;</span> Back to Property Explorer
+  </a>
+</div>
+
+<!-- --- MAIN CONTENT --- -->
+<div class="section-container" style="margin-top: 10px; margin-bottom: 60px;" *ngIf="property">
+  <div class="details-layout">
+    <div class="details-left">
+      <h2 style="font-weight: 800; font-size: 1.8rem; color: var(--primary); margin-bottom: 15px; margin-top: 10px;">{{ property.title }}</h2>
+      <div class="image-slider">
+        <div class="slider-arrow left-arrow" (click)="prevImage()">&#10094;</div>
+        <img [src]="images[currentImageIndex]" alt="Property Image">
+        <div class="slider-arrow right-arrow" (click)="nextImage()">&#10095;</div>
+      </div>
+    </div>
+    
+    <!-- Right Column: Info & Seller -->
+    <div class="details-right">
+      <div class="price-card">
+        <div class="price-header">
+          <h1>₹ {{ property.price }}</h1>
+          <div class="action-icons">
+            <span title="Wishlist" (click)="toggleWishlist()" [style.color]="isWishlisted ? 'red' : 'var(--text-muted)'" style="cursor: pointer;">{{ isWishlisted ? '❤️' : '♡' }}</span>
+          </div>
+        </div>
+        <p class="summary-text">{{ isPlot ? 'Nil' : property.bedrooms + ' BHK' }} - {{ isPlot ? 'Nil' : property.bathrooms + ' Bathroom' }} - {{ property.areaSize ? property.areaSize + ' sqft' : 'Nil' }}</p>
+        <p class="location-text">{{ property.address }}</p>
+        <div class="location-footer">
+          <span>{{ property.address }}</span>
+          <span>Listed recently</span>
+        </div>
+      </div>
+
+      <div class="seller-card">
+        <div class="seller-info">
+          <div class="seller-avatar">
+            <img src="../../../assets/images/hero.png" alt="Seller">
+          </div>
+          <div class="seller-details">
+            <p class="posted-by">Posted By <strong>Apex World</strong></p>
+          </div>
+        </div>
+        <div class="seller-stats">
+          <div class="stat">
+            <strong>624</strong>
+            <span>Items listed</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; width: 100%;">
+          <button class="chat-btn" style="margin-top: 0; width: 100%;">Chat with seller</button>
+          <button class="btn btn-primary" (click)="toggleAiDrawer()" style="width: 100%; border-radius: 6px; padding: 12px; font-weight: 700; background-color: #1e3a8a; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            🤖 Ask AI Property Companion
+          </button>
+        </div>
+        <div class="phone-number" style="margin-top: 5px;">
+          📞 +91 99628 81452
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="specs-section">
+    <h3>Details</h3>
+    <div class="specs-grid">
+      <div class="spec-item"><span class="spec-label">Type</span><span class="spec-value">{{ property.category?.name || 'Apartments' }}</span></div>
+      <div class="spec-item"><span class="spec-label">BHK</span><span class="spec-value">{{ isPlot ? 'Nil' : property.bedrooms }}</span></div>
+      <div class="spec-item"><span class="spec-label">Bathrooms</span><span class="spec-value">{{ isPlot ? 'Nil' : property.bathrooms }}</span></div>
+      <div class="spec-item"><span class="spec-label">Furnishing</span><span class="spec-value">{{ isPlot ? 'Nil' : property.furnishing }}</span></div>
+      <div class="spec-item"><span class="spec-label">Area Size (sqft)</span><span class="spec-value">{{ property.areaSize }}</span></div>
+      <div class="spec-item"><span class="spec-label">Carpet Area (sqft)</span><span class="spec-value">{{ isPlot ? 'Nil' : property.carpetArea }}</span></div>
+      <div class="spec-item"><span class="spec-label">Maintenance (Monthly)</span><span class="spec-value">₹ {{ property.maintenance }}</span></div>
+      <div class="spec-item"><span class="spec-label">Total Floors</span><span class="spec-value">{{ isPlot ? 'Nil' : property.totalFloors }}</span></div>
+      <div class="spec-item"><span class="spec-label">Car Parking</span><span class="spec-value">{{ isPlot ? 'Nil' : property.carParking }}</span></div>
+      <div class="spec-item"><span class="spec-label">Facing</span><span class="spec-value">{{ property.facing || 'Facing Not Specified' }}</span></div>
+      <div class="spec-item"><span class="spec-label">Project Name</span><span class="spec-value">{{ property.projectName || property.title }}</span></div>
+    </div>
+  </div>
+
+  <div class="description-section">
+    <h3>Description</h3>
+    <p>{{ property.description || 'Welcome to your dream property! Contact us today to schedule a site visit.' }}</p>
+  </div>
+
+  <div class="tax-breakdown-section">
+    <h3 class="tax-title">TAX & CHARGES BREAKDOWN</h3>
+    <div class="tax-cards-grid">
+      <div class="tax-card">
+        <div class="tax-label">BASE PROPERTY VALUE</div>
+        <div class="tax-value">₹ {{ taxBaseValue | number:'1.0-0' }}</div>
+      </div>
+      <div class="tax-card">
+        <div class="tax-label">GST ({{ gstRate * 100 }}%)</div>
+        <div class="tax-value">₹ {{ gstValue | number:'1.0-0' }}</div>
+      </div>
+      <div class="tax-card">
+        <div class="tax-label">REGISTRATION (3%)</div>
+        <div class="tax-value">₹ {{ regValue | number:'1.0-0' }}</div>
+      </div>
+      <div class="tax-card">
+        <div class="tax-label">TOTAL PAYABLE</div>
+        <div class="tax-value highlight-orange">₹ {{ totalValue | number:'1.0-0' }}</div>
+      </div>
+    </div>
+    <div class="tax-footer-bar">
+      <div class="tax-footer-text">Total Amount Payable <span style="font-weight: 400; font-size: 0.9em;">(Including Taxes & Fees)</span></div>
+      <div class="tax-footer-total">₹ {{ totalValue | number:'1.0-0' }}</div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <button (click)="goBack()" class="btn btn-outline btn-lg" style="margin-right: 16px; border: 2px solid var(--primary); color: var(--primary); font-weight: 700; background: transparent; border-radius: 8px;">Back to Explorer</button>
+    <a [routerLink]="['/buyer-dashboard/site-visits']" [queryParams]="{id: property.id}" class="btn btn-primary btn-lg" style="text-decoration:none; padding:12px 24px;">Site Visit</a>
+  </div>
+</div>

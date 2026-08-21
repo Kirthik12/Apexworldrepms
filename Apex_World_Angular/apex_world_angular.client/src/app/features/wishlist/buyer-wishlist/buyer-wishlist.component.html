@@ -1,0 +1,146 @@
+<!-- ─── EXCLUSIVE DEALS TOP BAR (inline, flush with navbar) ─── -->
+<div style="background: var(--primary); display: flex; align-items: center; justify-content: center;
+            height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff;
+            margin-top: -104px; position: relative; z-index: 500; width: 100%;"
+     id="wl-top-offers-banner">
+  <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+  <div id="wl-slides-container" style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+    <div class="wl-offer-slide" routerLink="/buyer-dashboard/property-details" [queryParams]="{id: '14'}"
+         style="position: absolute; width: 100%; text-align: center; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: auto; cursor: pointer;">
+      <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+      <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">₹ 80 Lakhs</span>
+      <span style="font-weight: 700; color: #a5d6a7;">₹ 75 Lakhs</span>
+    </div>
+  </div>
+  <button (click)="dismissBanner()" style="position: absolute; right: 16px; background: transparent; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; font-weight: 700;">&times;</button>
+</div>
+
+<!-- HERO BANNER -->
+<section class="wl-hero">
+  <div class="wl-hero-inner">
+    <div class="wl-hero-text">
+      <div class="wl-hero-badge">❤️ MY WISHLIST</div>
+      <h1 class="wl-hero-title">Saved <span class="wl-hero-accent">Properties</span></h1>
+      <p class="wl-hero-sub">Properties you've saved for later. Compare your favourites and make the perfect decision.</p>
+      <div class="wl-hero-stats">
+        <div class="wl-stat-pill">
+          <span class="wl-stat-num">{{ wishlistProperties.length }}</span>
+          <span class="wl-stat-label">Total Saved</span>
+        </div>
+      </div>
+    </div>
+    <div class="wl-hero-actions">
+      <button (click)="shareWishlist()" class="wl-btn-secondary"><span>🔗</span> Share Wishlist</button>
+      <button class="wl-btn-danger" [disabled]="selectedIds.size === 0" (click)="deleteSelected()"><span>🗑️</span> Delete Selected (<span>{{ selectedIds.size }}</span>)</button>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<div class="wl-page">
+  <div class="wl-layout">
+    <div class="wl-main">
+      <div class="wl-toolbar">
+        <div class="wl-tabs">
+          <span class="wl-tab active">All Properties (<span>{{ filteredProperties.length }}</span>)</span>
+        </div>
+        <div class="wl-search-wrap">
+          <span class="wl-search-icon">🔍</span>
+          <input type="text" class="wl-search" placeholder="Search in wishlist..." (input)="onSearch($event)">
+        </div>
+      </div>
+      
+      <div id="wishlist-list-container">
+        
+        <div *ngIf="filteredProperties.length === 0" style="text-align:center;padding:60px 20px;background:#fff;border-radius:18px;border:1px solid var(--border);">
+          <div style="font-size:3rem;margin-bottom:12px;">💔</div>
+          <h3 style="color:var(--primary);font-size:1.3rem;margin:0 0 8px;">Your wishlist is empty</h3>
+          <p style="color:var(--text-muted);font-size:0.95rem;">Browse properties and add your favourites here.</p>
+        </div>
+
+        <div class="wishlist-item-row" *ngFor="let prop of filteredProperties" [style.opacity]="prop.status === 'Booked' ? '0.75' : '1'">
+          <input type="checkbox" class="wishlist-select-checkbox" [disabled]="prop.status === 'Booked'" [checked]="selectedIds.has(prop.id)" (change)="toggleSelection(prop.id, $event)" style="width:18px;height:18px;cursor:pointer;accent-color:var(--primary);">
+          
+          <div style="width:150px;height:100px;border-radius:12px;overflow:hidden;position:relative;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.12);">
+            <img [src]="getImageUrl(prop.images)" style="width:100%;height:100%;object-fit:cover;" [alt]="prop.title">
+            <div style="position:absolute;top:8px;left:8px;background:var(--success,#10B981);color:#fff;font-size:0.63rem;font-weight:700;padding:3px 7px;border-radius:5px;">{{ prop.category?.name || 'Sale' }}</div>
+          </div>
+          
+          <div style="flex:1;min-width:0;">
+            <h4 style="font-size:1.1rem;font-weight:800;color:var(--primary);margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ prop.title }}</h4>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 8px;">📍 {{ prop.address }}</p>
+            <div style="font-size:0.8rem;color:var(--text-muted);">
+              {{ prop.bedrooms ? '🛏 ' + prop.bedrooms + ' Beds • ' : '' }}
+              {{ prop.bathrooms ? '🚿 ' + prop.bathrooms + ' Baths • ' : '' }}
+              {{ prop.areaSize ? '📐 ' + prop.areaSize + ' sq.ft' : '' }}
+            </div>
+            <!-- Show reason if booked -->
+            <div *ngIf="prop.status === 'Booked'" style="margin-top: 6px; color: #EF4444; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+              ⚠️ Property Booked — No longer available
+            </div>
+          </div>
+          
+          <div style="font-size:1.3rem;font-weight:800;color:var(--accent-dark,#c26d1a);white-space:nowrap;min-width:100px;text-align:right;">₹ {{ prop.price }}</div>
+          
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:120px;">
+            <button class="action-btn action-secondary" style="padding: 8px 14px; font-size: 0.85rem;" [disabled]="prop.status === 'Booked'" [style.opacity]="prop.status === 'Booked' ? '0.5' : '1'" [style.cursor]="prop.status === 'Booked' ? 'not-allowed' : 'pointer'" (click)="prop.status !== 'Booked' && viewDetails(prop.id)">View Details</button>
+            <button class="action-btn action-reject" style="padding: 8px 14px; font-size: 0.85rem;" (click)="promptRemove(prop.id, prop.title)">🗑 Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <aside class="wl-sidebar">
+      <div class="wl-sb-card wl-summary-card">
+        <div class="wl-sb-card-header">
+          <div class="wl-sb-icon">🏢</div>
+          <div>
+            <div class="wl-sb-count">{{ wishlistProperties.length }}</div>
+            <div class="wl-sb-count-label">Saved Properties</div>
+          </div>
+        </div>
+        <div class="wl-sb-divider"></div>
+        <div class="wl-sb-stat-row">
+          <span class="wl-sb-stat-label">Total Value</span>
+          <span class="wl-sb-stat-val wl-accent">₹ {{ totalValue | number:'1.0-0' }}</span>
+        </div>
+        <div class="wl-sb-stat-row">
+          <span class="wl-sb-stat-label">Average Price</span>
+          <span class="wl-sb-stat-val wl-primary">₹ {{ averageValue | number:'1.0-0' }}</span>
+        </div>
+      </div>
+      
+      <div class="wl-sb-card wl-actions-card">
+        <h4 class="wl-sb-section-title">Quick Actions</h4>
+        <div (click)="shareWishlist()" class="wl-action-item" style="cursor: pointer;">
+          <div class="wl-action-dot" style="background:#EFF6FF;color:#2563EB;">🔗</div>
+          <div><div class="wl-action-title">Share Wishlist Link</div><div class="wl-action-sub">Generate a public reference link</div></div>
+        </div>
+        <div (click)="clearAll()" class="wl-action-item wl-action-danger" style="cursor: pointer;">
+          <div class="wl-action-dot" style="background:#FEE2E2;color:#DC2626;">🗑️</div>
+          <div><div class="wl-action-title">Clear All Items</div><div class="wl-action-sub">Remove all saved properties</div></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- REMOVE CONFIRMATION MODAL -->
+<div class="bm-modal-overlay" [class.show]="!!pendingRemoveId" (click)="cancelRemove()">
+  <div class="bm-modal-content" style="width: 440px; border-radius: 16px; overflow: hidden;" (click)="$event.stopPropagation()">
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #B91C1C 0%, #EF4444 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">🗑️</span>
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Remove from Wishlist?</h3>
+      </div>
+      <button class="modal-close-btn" (click)="cancelRemove()">✕</button>
+    </div>
+    <div style="padding: 24px; font-size: 0.95rem; color: #334155;">
+      <p style="margin: 0; line-height: 1.6;">Are you sure you want to remove <strong>{{ pendingRemoveTitle }}</strong> from your wishlist? This action cannot be undone.</p>
+    </div>
+    <div class="receipt-modal-footer">
+      <button class="action-btn action-secondary" (click)="cancelRemove()">Cancel</button>
+      <button class="action-btn action-reject" (click)="confirmRemove()">Yes, Remove</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,176 @@
+<!-- --- TOP BAR & HEADER NAV --- -->
+<div id="navbar-container">
+  <div class="top-bar" id="top-offers-banner" style="background: var(--primary); display: flex; align-items: center; justify-content: center; height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff;">
+    <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+    <div style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <div class="top-offer-slide" style="position: absolute; width: 100%; text-align: center; opacity: 1; pointer-events: none;">
+        <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+        <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">&#8377; 80 Lakhs</span>
+        <span style="font-weight: 700; color: #a5d6a7;">&#8377; 75 Lakhs</span>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a routerLink="/" class="logo">
+        <div class="logo-badge"><img src="assets/images/logo.png" alt="Apex World Brand Logo"></div>
+        APEX <span>WORLD</span>
+      </a>
+      <nav>
+        <a routerLink="/" class="active">Home</a>
+        <a routerLink="/" fragment="featured-properties">Property</a>
+        <a routerLink="/" fragment="services">Services</a>
+        <a routerLink="/" fragment="enquiry-desk">Enquiry Desk</a>
+        <a routerLink="/" fragment="" id="nav-contacts-link">Contacts</a>
+      </nav>
+      <div class="header-actions">
+        <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
+        <a routerLink="/signup" class="btn btn-primary btn-sm">Register Here</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<!-- --- SIGNUP MAIN PANEL --- -->
+<div class="auth-wrapper">
+  <div class="signup-page-container">
+
+    <!-- Left Premium Panel -->
+    <div class="signup-left-panel">
+      <div class="left-panel-content">
+        <span class="panel-badge">Premium Membership</span>
+        <h1 class="panel-heading">Discover Luxury Living</h1>
+        <p class="panel-text">Join Apex World and gain exclusive access to premium real estate listings, expert insights, and seamless property management tailored to your lifestyle.</p>
+      </div>
+    </div>
+
+    <!-- Right Registration Panel -->
+    <div class="signup-right-panel">
+      <div class="auth-card">
+        <h2>Create Account</h2>
+        <p class="subtitle">Join Apex World Real Estate Platform</p>
+
+        <!-- Global Messages -->
+        <div *ngIf="successMessage" style="background:#d1e7dd; color:#0f5132; padding:12px 16px; margin-bottom:20px; border-radius:8px; text-align:center; font-weight:600;">
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" style="background:#f8d7da; color:#842029; padding:12px 16px; margin-bottom:20px; border-radius:8px; text-align:center; font-weight:600;">
+          {{ errorMessage }}
+        </div>
+
+        <form class="auth-form" (ngSubmit)="submit()" novalidate #signupForm="ngForm">
+
+          <!-- Full Name -->
+          <div class="form-group mb-3">
+            <label for="fullname">Full Name <span class="required-star">*</span></label>
+            <input type="text" id="fullname" name="fullName" class="form-control"
+              placeholder="Enter your full name" [(ngModel)]="fullName" required minlength="3" #fullNameModel="ngModel" 
+              [class.is-invalid-custom]="fullNameModel.invalid && (fullNameModel.dirty || fullNameModel.touched)">
+            
+            <div *ngIf="fullNameModel.invalid && (fullNameModel.dirty || fullNameModel.touched)" class="invalid-feedback-custom">
+              <span *ngIf="fullNameModel.errors?.['required']">Full Name is required.</span>
+              <span *ngIf="fullNameModel.errors?.['minlength']">Full Name must be at least 3 characters.</span>
+            </div>
+          </div>
+
+          <!-- Email & Phone -->
+          <div class="form-row">
+            <div class="form-group mb-3">
+              <label for="email">Email Address <span class="required-star">*</span></label>
+              <input type="email" id="email" name="email" class="form-control"
+                placeholder="name@domain.com" [(ngModel)]="email" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" #emailModel="ngModel" 
+                [class.is-invalid-custom]="emailModel.invalid && (emailModel.dirty || emailModel.touched)">
+              
+              <div *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)" class="invalid-feedback-custom">
+                <span *ngIf="emailModel.errors?.['required']">Email Address is required.</span>
+                <span *ngIf="emailModel.errors?.['pattern']">Enter a valid email (e.g. name@gmail.com).</span>
+              </div>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="phone">Phone Number <span class="required-star">*</span></label>
+              <input type="text" id="phone" name="phone" class="form-control"
+                placeholder="Enter phone number" [(ngModel)]="phone" required pattern="^[6-9]\d{9}$" #phoneModel="ngModel" 
+                [class.is-invalid-custom]="phoneModel.invalid && (phoneModel.dirty || phoneModel.touched)">
+              
+              <div *ngIf="phoneModel.invalid && (phoneModel.dirty || phoneModel.touched)" class="invalid-feedback-custom">
+                <span *ngIf="phoneModel.errors?.['required']">Phone Number is required.</span>
+                <span *ngIf="phoneModel.errors?.['pattern']">Must be 10 digits starting with 6, 7, 8, or 9.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DOB & Username -->
+          <div class="form-row">
+            <div class="form-group mb-3">
+              <label for="dob">Date of Birth <span class="required-star">*</span></label>
+              <input type="date" id="dob" name="dob" class="form-control"
+                [(ngModel)]="dob" required #dobModel="ngModel" 
+                [class.is-invalid-custom]="(dobModel.invalid && (dobModel.dirty || dobModel.touched)) || errors['dob']">
+              
+              <div *ngIf="dobModel.invalid && (dobModel.dirty || dobModel.touched)" class="invalid-feedback-custom">
+                <span *ngIf="dobModel.errors?.['required']">Date of Birth is required.</span>
+              </div>
+              <!-- Custom age validation pushed from TS on submit/blur -->
+              <div class="invalid-feedback-custom" *ngIf="errors['dob']">{{ errors['dob'] }}</div>
+            </div>
+            
+            <div class="form-group mb-3">
+              <label for="username">Username <span class="required-star">*</span></label>
+              <input type="text" id="username" name="username" class="form-control"
+                placeholder="Pick a username" [(ngModel)]="username" required minlength="4" #usernameModel="ngModel" 
+                [class.is-invalid-custom]="usernameModel.invalid && (usernameModel.dirty || usernameModel.touched)">
+              
+              <div *ngIf="usernameModel.invalid && (usernameModel.dirty || usernameModel.touched)" class="invalid-feedback-custom">
+                <span *ngIf="usernameModel.errors?.['required']">Username is required.</span>
+                <span *ngIf="usernameModel.errors?.['minlength']">Username must be at least 4 characters.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password & Confirm -->
+          <div class="form-row">
+            <div class="form-group mb-4">
+              <label for="password">Password <span class="required-star">*</span></label>
+              <input type="password" id="password" name="password" class="form-control"
+                placeholder="Create password" [(ngModel)]="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$" #passwordModel="ngModel" 
+                [class.is-invalid-custom]="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)">
+              
+              <div *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)" class="invalid-feedback-custom">
+                <span *ngIf="passwordModel.errors?.['required']">Password is required.</span>
+                <span *ngIf="passwordModel.errors?.['pattern']">Min 6 chars, 1 upper, 1 lower, 1 number, 1 special.</span>
+              </div>
+            </div>
+            
+            <div class="form-group mb-4">
+              <label for="confirm-password">Confirm Password <span class="required-star">*</span></label>
+              <input type="password" id="confirm-password" name="confirmPassword" class="form-control"
+                placeholder="Confirm password" [(ngModel)]="confirmPassword" required #confirmPasswordModel="ngModel" 
+                [class.is-invalid-custom]="(confirmPasswordModel.invalid && (confirmPasswordModel.dirty || confirmPasswordModel.touched)) || (confirmPasswordModel.dirty && password !== confirmPassword)">
+              
+              <div *ngIf="confirmPasswordModel.invalid && (confirmPasswordModel.dirty || confirmPasswordModel.touched)" class="invalid-feedback-custom">
+                <span *ngIf="confirmPasswordModel.errors?.['required']">Please confirm your password.</span>
+              </div>
+              <div *ngIf="!confirmPasswordModel.errors?.['required'] && confirmPasswordModel.dirty && password !== confirmPassword" class="invalid-feedback-custom">
+                Passwords do not match.
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-3" [disabled]="signupForm.invalid">
+            {{ isSubmitting ? 'Creating Account...' : 'Create Premium Account' }}
+          </button>
+        </form>
+
+        <div class="text-center" style="margin-top: 24px;">
+          <p style="font-size: 0.95rem; color: #64748B;">
+            Already have an account?
+            <a routerLink="/login" style="color: #C9962A; font-weight: 700; text-decoration: none; transition: 0.2s;">Log In Here</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

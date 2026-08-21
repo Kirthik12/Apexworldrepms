@@ -1,0 +1,60 @@
+<div class="ai-drawer-overlay" *ngIf="isOpen" (click)="onClose()"></div>
+
+<div class="ai-drawer" [class.open]="isOpen">
+  <div class="drawer-header">
+    <div class="header-title">
+      <span class="ai-icon">🤖</span>
+      <h3>AI Property Companion</h3>
+    </div>
+    <button class="close-btn" (click)="onClose()">&times;</button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="welcome-message" *ngIf="chatHistory.length === 0">
+      <p>Hello! I am your AI Property Companion. Ask me anything about this property's details, pricing, layout, or ask me to schedule a site visit!</p>
+    </div>
+
+    <div class="chat-messages">
+      <div *ngFor="let msg of chatHistory" class="message-wrapper" [class.user-msg]="msg.sender === 'user'" [class.ai-msg]="msg.sender === 'ai'">
+        <div class="message-bubble">
+          <img *ngIf="msg.imagePreviewUrl" [src]="msg.imagePreviewUrl" class="msg-image-preview" alt="Uploaded Context">
+          <p class="msg-text">{{ msg.text }}</p>
+
+          <!-- Interactive Booking Widget -->
+          <div *ngIf="msg.isBookingWidget && msg.slots" class="booking-widget">
+            <p class="widget-title">Select a site-visit time slot:</p>
+            <div class="slots-grid">
+              <button *ngFor="let slot of msg.slots" class="slot-btn" (click)="bookSlot(slot)">
+                📅 {{ slot }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="message-wrapper ai-msg">
+        <div class="message-bubble typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-footer">
+    <div class="preview-area" *ngIf="selectedImagePreview">
+      <img [src]="selectedImagePreview" alt="Upload preview">
+      <button class="remove-preview" (click)="selectedImagePreview = null; selectedImageBase64 = null">&times;</button>
+    </div>
+
+    <div class="input-row">
+      <label class="attach-btn" title="Upload Image / Floor Plan">
+        📎
+        <input type="file" (change)="onImageSelected($event)" accept="image/*" style="display: none;">
+      </label>
+      <input type="text" [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Type a message..." [disabled]="isLoading">
+      <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading || (!userInput.trim() && !selectedImageBase64)">
+        ➤
+      </button>
+    </div>
+  </div>
+</div>

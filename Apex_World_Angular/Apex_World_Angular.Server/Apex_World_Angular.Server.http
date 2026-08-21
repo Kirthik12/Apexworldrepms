@@ -1,0 +1,6 @@
+@Apex_World_Angular.Server_HostAddress = http://localhost:5186
+
+GET {{Apex_World_Angular.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

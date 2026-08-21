@@ -1,0 +1,500 @@
+<app-admin-header breadcrumb="Property Management" title="Property Portfolio"></app-admin-header>
+
+<div class="pm-tab-bar">
+  <button class="pm-tab" [class.active]="activeTab === 'all'" (click)="switchToTab('all')">All Properties</button>
+  <button class="pm-tab" [class.active]="activeTab === 'add'" (click)="switchToTab('add')">Add Property</button>
+</div>
+
+<!-- --- TAB: ALL PROPERTIES ------------------- -->
+<div class="tab-panel" [class.active]="activeTab === 'all'">
+  <div class="kpi-row">
+    <div class="kpi-card" style="cursor: pointer;" (click)="filterBy('All')" [ngStyle]="{'box-shadow': activeFilter === 'All' ? '0 0 0 2px #2563eb' : 'none'}">
+      <p class="kpi-label">TOTAL PROPERTIES</p>
+      <h2 class="kpi-value">{{ totalProperties }}</h2>
+      <p class="kpi-sub">All categories</p>
+    </div>
+    <div class="kpi-card green" style="cursor: pointer;" (click)="filterBy('Available')" [ngStyle]="{'box-shadow': activeFilter === 'Available' ? '0 0 0 2px #10B981' : 'none'}">
+      <p class="kpi-label">AVAILABLE</p>
+      <h2 class="kpi-value">{{ availableProperties }}</h2>
+      <p class="kpi-sub">Ready to view</p>
+    </div>
+    <div class="kpi-card blue" style="cursor: pointer;" (click)="filterBy('Booked')" [ngStyle]="{'box-shadow': activeFilter === 'Booked' ? '0 0 0 2px #3B82F6' : 'none'}">
+      <p class="kpi-label">BOOKED</p>
+      <h2 class="kpi-value">{{ bookedProperties }}</h2>
+      <p class="kpi-sub">Reserved properties</p>
+    </div>
+    <div class="kpi-card orange" style="cursor: pointer;" (click)="filterBy('Sold')" [ngStyle]="{'box-shadow': activeFilter === 'Sold' ? '0 0 0 2px #F59E0B' : 'none'}">
+      <p class="kpi-label">SOLD / RENTED</p>
+      <h2 class="kpi-value">{{ soldProperties }}</h2>
+      <p class="kpi-sub">Closed deals</p>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div style="display: flex; gap: 10px; flex: 1;">
+      <input type="text" class="filter-search" placeholder="Search by property name, ID…" style="flex: 0.7;">
+      <button class="btn-header-secondary" style="flex: 0.3; border-radius: 8px; border: 1px solid var(--border); font-weight: 500; cursor:pointer;">Clear Filters</button>
+    </div>
+    <div class="filter-selects">
+      <select class="filter-select">
+        <option value="">Category: All</option>
+        <option>Villa</option>
+        <option>Apartment</option>
+        <option>Studio</option>
+        <option>Plot</option>
+        <option>Commercial</option>
+      </select>
+      <select class="filter-select">
+        <option value="">Status: All</option>
+        <option>Available</option>
+        <option>Booked</option>
+        <option>Sold</option>
+      </select>
+      <button class="btn-bulk-delete" disabled title="Select rows to enable">🗑️ Delete Selected</button>
+    </div>
+  </div>
+
+  <div class="agy-table-container">
+    <table class="agy-table">
+      <thead>
+        <tr>
+          <th><input type="checkbox"></th>
+          <th>Property Name</th>
+          <th>Location</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>View</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="properties.length === 0">
+          <td colspan="8" style="text-align:center;padding:40px;color:#94A3B8;">No data available</td>
+        </tr>
+        <tr *ngFor="let item of properties">
+          <td><input type="checkbox" class="row-chk"></td>
+          <td>
+            <div class="prop-name-cell">
+              <img [src]="getCoverImage(item)" class="prop-thumb">
+              <div>
+                <div class="prop-name">{{ item.title }}</div>
+                <div style="font-size:0.75rem;color:#94A3B8;">ID-{{ item.id }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ item.address }}</td>
+          <td>{{ item.category?.name || item.category || 'N/A' }}</td>
+          <td style="font-weight:700;color:#2563EB;">₹{{ item.price }}</td>
+          <td><span class="status-badge" [ngClass]="getBadgeClass(item.status || (item.isAvailable ? 'Available' : 'Unavailable'))">{{ item.status || (item.isAvailable ? 'Available' : 'Unavailable') }}</span></td>
+          <td>
+            <button class="action-btn action-secondary" (click)="viewPropertyDetails(item.id)" title="View Details" style="padding: 6px 12px; font-size: 0.85rem;">
+              View Details
+            </button>
+          </td>
+          <td>
+            <div class="action-cell" style="display: flex; gap: 8px;">
+              <button class="action-btn action-primary" (click)="promptEdit(item.id)" style="padding: 6px 12px; font-size: 0.85rem;">Edit</button>
+              <button class="action-btn action-secondary" (click)="promptStatusUpdate(item.id)" style="padding: 6px 12px; font-size: 0.85rem;">Status</button>
+              <button class="action-btn action-reject" (click)="promptDelete(item.id)" style="padding: 6px 12px; font-size: 0.85rem;">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="agy-table-pagination">
+      <div class="agy-table-pagination-controls">
+        <app-pagination 
+          [currentPage]="pageNumber" 
+          [totalItems]="totalItems" 
+          [pageSize]="pageSize" 
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- --- TAB: ADD PROPERTY ------------------- -->
+<div class="tab-panel" [class.active]="activeTab === 'add'">
+  <div class="add-prop-layout">
+    <div class="add-form-card">
+      <h2 class="form-title">Add New Property Entry</h2>
+      <form [formGroup]="addPropertyForm" (ngSubmit)="requestAddProperty()" novalidate>
+        <div class="add-form-section-title">Property Base Details &amp; Specification Form</div>
+        <div class="add-form-grid">
+          <div class="form-group">
+            <label>PROPERTY TITLE NAME <span class="required-star">*</span></label>
+            <input type="text" formControlName="title" class="form-input" placeholder="e.g. Apex Horizon Heights Apt B4" [class.is-invalid-custom]="addPropertyForm.get('title')?.invalid && (addPropertyForm.get('title')?.dirty || addPropertyForm.get('title')?.touched)">
+            <div *ngIf="addPropertyForm.get('title')?.invalid && (addPropertyForm.get('title')?.dirty || addPropertyForm.get('title')?.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="form-group">
+            <label>NUMBER OF BEDS</label>
+            <input type="number" formControlName="bedrooms" class="form-input" placeholder="e.g. 3" min="0">
+          </div>
+          <div class="form-group">
+            <label>NUMBER OF BATHS</label>
+            <input type="number" formControlName="bathrooms" class="form-input" placeholder="e.g. 2" min="0">
+          </div>
+          <div class="form-group">
+            <label>OFFICIAL ADDRESS DESCRIPTION <span class="required-star">*</span></label>
+            <input type="text" formControlName="address" class="form-input" placeholder="Besant Nagar, Chennai" [class.is-invalid-custom]="addPropertyForm.get('address')?.invalid && (addPropertyForm.get('address')?.dirty || addPropertyForm.get('address')?.touched)">
+            <div *ngIf="addPropertyForm.get('address')?.invalid && (addPropertyForm.get('address')?.dirty || addPropertyForm.get('address')?.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="form-group">
+            <label>VALUATION PRICE (₹) <span class="required-star">*</span></label>
+            <input type="number" formControlName="price" class="form-input" placeholder="e.g. 750000" [class.is-invalid-custom]="addPropertyForm.get('price')?.invalid && (addPropertyForm.get('price')?.dirty || addPropertyForm.get('price')?.touched)">
+            <div *ngIf="addPropertyForm.get('price')?.invalid && (addPropertyForm.get('price')?.dirty || addPropertyForm.get('price')?.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="form-group">
+            <label>AREA SIZE (SQ FT)</label>
+            <input type="number" formControlName="areaSize" class="form-input" placeholder="e.g. 2400">
+          </div>
+          <div class="form-group">
+            <label>CARPET AREA (SQ FT)</label>
+            <input type="number" formControlName="carpetArea" class="form-input" placeholder="e.g. 1800">
+          </div>
+          <div class="form-group">
+            <label>FURNISHING</label>
+            <select formControlName="furnishing" class="form-input">
+              <option value="Fully-Furnished">Fully-Furnished</option>
+              <option value="Semi-Furnished">Semi-Furnished</option>
+              <option value="Unfurnished">Unfurnished</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>MAINTENANCE (MONTHLY)</label>
+            <input type="number" formControlName="maintenance" class="form-input" placeholder="e.g. 2000">
+          </div>
+          <div class="form-group">
+            <label>FACING</label>
+            <select formControlName="facing" class="form-input">
+              <option value="East">East</option>
+              <option value="West">West</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>TOTAL FLOORS</label>
+            <input type="number" formControlName="totalFloors" class="form-input" placeholder="e.g. 12">
+          </div>
+          <div class="form-group">
+            <label>CAR PARKING</label>
+            <input type="number" formControlName="carParking" class="form-input" placeholder="e.g. 2">
+          </div>
+          <div class="form-group">
+            <label>PROJECT NAME</label>
+            <input type="text" formControlName="projectName" class="form-input" placeholder="e.g. Apex Horizon">
+          </div>
+          <div class="form-group" style="grid-column:3">
+            <label>PROPERTY CATEGORY <span class="required-star">*</span></label>
+            <select formControlName="category" class="form-input" [class.is-invalid-custom]="addPropertyForm.get('category')?.invalid && (addPropertyForm.get('category')?.dirty || addPropertyForm.get('category')?.touched)">
+              <option value="Villa">Villa</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Studio">Studio</option>
+              <option value="Plot">Plot</option>
+              <option value="Commercial">Commercial</option>
+            </select>
+            <div *ngIf="addPropertyForm.get('category')?.invalid && (addPropertyForm.get('category')?.dirty || addPropertyForm.get('category')?.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>DETAILED PROPERTY DESCRIPTION VALUE</label>
+            <textarea formControlName="description" class="form-input" rows="6" placeholder="Provide public-facing details..."></textarea>
+          </div>
+        </div>
+        <div class="add-form-actions">
+          <button type="submit" class="btn-primary-form" [disabled]="addPropertyForm.invalid">Save Entry &amp; Register Flat</button>
+          <button type="button" class="btn-bulk-import">📄 Bulk Import (Excel/CSV)</button>
+          <button type="reset" class="btn-secondary-form">Clear Form</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="media-upload-card">
+      <h3 class="media-title">Active Media &amp; Documentation Upload</h3>
+      <div class="drop-zone">
+        <div class="drop-zone-inner">
+          <div class="drop-icon">📥</div>
+          <p class="drop-text">Select a cover image for the property</p>
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-input" style="width: 100%;">
+          <div *ngIf="selectedFile" style="margin-top: 10px; color: var(--brand-primary); font-weight: bold;">
+            Selected: {{ selectedFile.name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- --- VIEW DETAILS MODAL ------------------------------- -->
+<div class="bm-modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+  <div class="bm-modal-content" (click)="$event.stopPropagation()" style="width: 700px; border-radius: 16px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">🏢</span>
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Property Details</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeViewModal()">✕</button>
+    </div>
+    <div class="modal-body" *ngIf="viewProperty" style="overflow-y: auto; padding: 24px;">
+      <!-- Cover image -->
+      <div class="view-cover" *ngIf="getCoverImage(viewProperty)">
+        <img [src]="getCoverImage(viewProperty)" alt="Property" class="view-cover-img">
+      </div>
+      <!-- Detail grid -->
+      <div class="view-detail-grid">
+        <div class="view-field">
+          <span class="view-label">Title</span>
+          <span class="view-value">{{ viewProperty.title }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Category</span>
+          <span class="view-value">{{ viewProperty.category?.name || viewProperty.category || 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Price</span>
+          <span class="view-value price-value">₹{{ viewProperty.price | number }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Status</span>
+          <span class="badge" [ngClass]="getBadgeClass(viewProperty.status || '')">{{ viewProperty.status || 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Address</span>
+          <span class="view-value">{{ viewProperty.address || 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Project Name</span>
+          <span class="view-value">{{ viewProperty.projectName || 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Bedrooms</span>
+          <span class="view-value">{{ viewProperty.bedrooms }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Bathrooms</span>
+          <span class="view-value">{{ viewProperty.bathrooms }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Area Size</span>
+          <span class="view-value">{{ viewProperty.areaSize ? viewProperty.areaSize + ' sq ft' : 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Carpet Area</span>
+          <span class="view-value">{{ viewProperty.carpetArea ? viewProperty.carpetArea + ' sq ft' : 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Furnishing</span>
+          <span class="view-value">{{ viewProperty.furnishing || 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Facing</span>
+          <span class="view-value">{{ viewProperty.facing || 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Total Floors</span>
+          <span class="view-value">{{ viewProperty.totalFloors }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Car Parking</span>
+          <span class="view-value">{{ viewProperty.carParking }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Maintenance</span>
+          <span class="view-value">{{ viewProperty.maintenance ? '₹' + viewProperty.maintenance + '/mo' : 'N/A' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Available</span>
+          <span class="view-value">{{ viewProperty.isAvailable ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="view-field view-field-full">
+          <span class="view-label">Description</span>
+          <span class="view-value">{{ viewProperty.description || 'No description provided.' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body" *ngIf="!viewProperty" style="text-align:center;padding:40px;color:#94A3B8;">Loading...</div>
+    <div class="receipt-modal-footer">
+      <button class="action-btn action-secondary" (click)="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- --- EDIT MODAL ------------------------------- -->
+<div class="bm-modal-overlay" *ngIf="showEditModal" (click)="showEditModal = false">
+  <div class="bm-modal-content" (click)="$event.stopPropagation()" style="width: 700px; border-radius: 16px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;">
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">✏️</span>
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Edit Property</h3>
+      </div>
+      <button class="modal-close-btn" (click)="showEditModal = false">✕</button>
+    </div>
+    <div class="modal-body" style="overflow-y: auto; padding: 24px;">
+      <form [formGroup]="editPropertyForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Property Title</label>
+            <input type="text" formControlName="title" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" formControlName="price" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Project Name</label>
+            <input type="text" formControlName="projectName" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Furnishing</label>
+            <select formControlName="furnishing" class="form-input">
+              <option value="Fully-Furnished">Fully-Furnished</option>
+              <option value="Semi-Furnished">Semi-Furnished</option>
+              <option value="Unfurnished">Unfurnished</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Total Floors</label>
+            <input type="number" formControlName="totalFloors" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>Maintenance</label>
+            <input type="number" formControlName="maintenance" class="form-input">
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Description</label>
+            <textarea formControlName="description" class="form-input" rows="3" style="resize:vertical;"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="receipt-modal-footer">
+      <button class="action-btn action-secondary" (click)="showEditModal = false">Cancel</button>
+      <button class="action-btn action-primary" (click)="submitEditProperty()" [disabled]="editPropertyForm.invalid">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- --- STATUS UPDATE MODAL ------------------------------- -->
+<div class="bm-modal-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()">
+  <div class="bm-modal-content" style="width: 500px; border-radius: 16px; overflow: hidden;" (click)="$event.stopPropagation()">
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">📊</span>
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Update Property Status</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeStatusModal()">✕</button>
+    </div>
+    <div style="padding: 24px;">
+      <form [formGroup]="statusForm">
+        <div class="form-grid">
+          <div class="form-group" style="grid-column:1/-1; margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 8px;">Listing Status</label>
+            <select formControlName="status" class="form-input" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Available">Available</option>
+              <option value="Booked">Booked</option>
+              <option value="Sold">Sold</option>
+              <option value="Unavailable">Unavailable</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1; display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" formControlName="isAvailable" id="status-avail-chk" style="width:16px;height:16px;cursor:pointer;">
+            <label for="status-avail-chk" style="margin:0;cursor:pointer; font-size: 0.95rem; color: #334155;">Is Property Available?</label>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="receipt-modal-footer">
+      <button type="button" class="action-btn action-secondary" (click)="closeStatusModal()">Cancel</button>
+      <button type="button" class="action-btn action-primary" (click)="submitStatusUpdate()" [disabled]="statusForm.invalid">Update Status</button>
+    </div>
+  </div>
+</div>
+
+<!-- --- DELETE CONFIRM MODAL ------------------------- -->
+<div class="bm-modal-overlay" [class.show]="showDeleteModal" (click)="showDeleteModal = false" id="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+  <div class="bm-modal-content" style="width: 440px; border-radius: 16px; overflow: hidden;" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #B45309 0%, #D97706 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">🗑️</span>
+        <h3 id="delete-modal-title" style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Confirm Deletion</h3>
+      </div>
+      <button (click)="showDeleteModal = false" class="modal-close-btn" aria-label="Close modal">✕</button>
+    </div>
+    <!-- Body -->
+    <div style="padding: 24px; font-size: 0.95rem; color: #334155;">
+      <p style="margin: 0; line-height: 1.6;">
+        Are you sure you want to delete this property? This action cannot be undone. The property will be permanently removed.
+      </p>
+    </div>
+    <!-- Footer -->
+    <div class="receipt-modal-footer">
+      <button (click)="showDeleteModal = false" class="action-btn action-secondary">Cancel</button>
+      <button (click)="executeDelete()" class="action-btn action-reject">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- --- ADD PROPERTY CONFIRM MODAL ------------------------- -->
+<div class="bm-modal-overlay" *ngIf="showAddConfirmModal" (click)="showAddConfirmModal = false">
+  <div class="bm-modal-content" style="width: 440px; border-radius: 16px; overflow: hidden;" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="receipt-modal-header" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">🏢</span>
+        <h3 style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">Confirm Property Entry</h3>
+      </div>
+      <button (click)="showAddConfirmModal = false" class="modal-close-btn" aria-label="Close modal">✕</button>
+    </div>
+    <!-- Body -->
+    <div style="padding: 24px; font-size: 0.95rem; color: #334155;">
+      <p style="margin: 0; line-height: 1.6;">
+        Are you sure you want to add this property to the database? Please review the details carefully.
+      </p>
+    </div>
+    <!-- Footer -->
+    <div class="receipt-modal-footer">
+      <button (click)="showAddConfirmModal = false" class="action-btn action-secondary">Cancel</button>
+      <button (click)="submitAddProperty()" class="action-btn action-primary">Yes, Add Property</button>
+    </div>
+  </div>
+</div>
+
+<!-- --- PROPERTY LISTING POLICY MODAL ------------------------- -->
+<div class="modal-overlay" *ngIf="showPolicyModal">
+  <div class="modal-card" style="max-width: 650px;">
+    <div class="modal-header">
+      <h3>Property Listing Policy</h3>
+      <button class="modal-close" (click)="acceptPolicy(false)">✖</button>
+    </div>
+    <div class="modal-body" style="text-align: left; max-height: 60vh; overflow-y: auto;">
+      <table class="pm-table" style="margin-top: 0;">
+        <thead>
+          <tr>
+            <th>PLP No.</th>
+            <th>Policy</th>
+            <th>Condition / Clause</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>PLP-01</td><td>Authorised Listings</td><td>Admin users must upload only properties they are authorised to manage.</td></tr>
+          <tr><td>PLP-02</td><td>Accurate Property Details</td><td>Admin users are responsible for maintaining accurate pricing, category, and availability information.</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 15px; font-size: 0.9rem; color: #64748b; display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="policy-agree-chk" #policyChk (change)="0" style="width: 16px; height: 16px; cursor: pointer;">
+        <label for="policy-agree-chk" style="cursor: pointer; margin: 0;">I have read and agree to the Property Listing Policy.</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary-form" [disabled]="!policyChk.checked" (click)="acceptPolicy(true)">Accept &amp; Continue</button>
+      <button class="btn-secondary-form" (click)="acceptPolicy(false)">Cancel</button>
+    </div>
+  </div>
+</div>

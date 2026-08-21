@@ -1,0 +1,414 @@
+/* ═══════════════════════════════════════════════════════════
+   EMI CALCULATOR PAGE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+.ec-page {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: #f4f6fa;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+/* ── Hero ── */
+.ec-hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  padding: 56px 48px 48px;
+  color: #fff;
+}
+.ec-hero-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+.ec-hero h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+.ec-hero p {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  max-width: 560px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Page Wrapper ── */
+.ec-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding: 0 24px;
+}
+
+/* ── Card ── */
+.ec-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+.ec-card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 26px;
+}
+
+/* ── Slider Fields ── */
+.ec-field {
+  margin-bottom: 28px;
+}
+.ec-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.ec-label-row label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+.ec-value-badge {
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+.ec-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #4338ca var(--pct, 50%), #e5e7eb var(--pct, 50%));
+  outline: none;
+  cursor: pointer;
+}
+.ec-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4338ca;
+  box-shadow: 0 2px 6px rgba(67,56,202,0.4);
+  cursor: pointer;
+}
+.ec-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 6px;
+}
+
+/* ── Manual Input Row ── */
+.ec-manual-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 8px;
+}
+.ec-mini-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.ec-inp {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.ec-inp:focus {
+  border-color: #4338ca;
+}
+
+/* ── Calculate Button ── */
+.ec-btn-calc {
+  margin-top: 22px;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4338ca, #6d28d9);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.ec-btn-calc:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* ── Results Column ── */
+.ec-results-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── EMI Result Card ── */
+.ec-emi-result-card {
+  text-align: center;
+}
+.ec-emi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.ec-emi-value {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #4338ca;
+  margin-bottom: 4px;
+}
+.ec-emi-sub {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+/* ── Donut Chart ── */
+.ec-donut-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 20px 0;
+}
+.ec-donut-chart {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+.ec-donut-svg {
+  width: 100%;
+  height: 100%;
+}
+.ec-donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.ec-donut-pct {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e1b4b;
+  line-height: 1;
+}
+.ec-donut-pct-label {
+  display: block;
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+.ec-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ec-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+.ec-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.ec-dot-principal { background: #4F46E5; }
+.ec-dot-interest  { background: #e5e7eb; border: 1.5px solid #d1d5db; }
+
+/* ── Breakdown ── */
+.ec-breakdown {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ec-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #6b7280;
+}
+.ec-breakdown-row strong {
+  color: #111827;
+  font-weight: 700;
+}
+.ec-interest-val { color: #ef4444 !important; }
+.ec-grand-total {
+  border-top: 1.5px dashed #e5e7eb;
+  padding-top: 12px;
+  font-weight: 700;
+  color: #111827 !important;
+}
+.ec-grand-total span { color: #111827; font-weight: 700; }
+
+/* ── Apply CTA Card ── */
+.ec-apply-card {
+  text-align: center;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  border: 1.5px solid #c7d2fe;
+}
+.ec-apply-icon {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+.ec-apply-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 8px;
+}
+.ec-apply-card p {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+.ec-btn-apply {
+  display: inline-block;
+  background: linear-gradient(135deg, #4338ca, #6d28d9);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.ec-btn-apply:hover { opacity: 0.9; }
+
+/* ── Bank Rates Card ── */
+.ec-banks-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 16px;
+}
+.ec-bank-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+}
+.ec-bank-row:last-child { border-bottom: none; }
+.ec-bank-name { font-weight: 600; color: #374151; flex: 1; }
+.ec-bank-rate { font-weight: 700; color: #4338ca; margin: 0 12px; }
+.ec-bank-type { color: #9ca3af; font-size: 12px; }
+
+/* ── Amortization Card ── */
+.ec-amort-card {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 24px 32px;
+}
+.ec-amort-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ec-amort-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0;
+}
+.ec-toggle-amort {
+  background: #eef2ff;
+  color: #4338ca;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ec-amort-table-wrap {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+.ec-amort-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.ec-amort-table th {
+  background: #f9fafb;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+.ec-amort-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+.ec-amort-table tr:hover td { background: #fafafa; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .ec-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .ec-hero {
+    padding: 36px 24px 30px;
+  }
+  .ec-hero h1 {
+    font-size: 1.8rem;
+  }
+  .ec-manual-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .ec-wrapper {
+    padding: 0 12px;
+  }
+  .ec-card {
+    padding: 20px;
+  }
+  .ec-manual-row {
+    grid-template-columns: 1fr;
+  }
+}

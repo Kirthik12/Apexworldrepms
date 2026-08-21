@@ -1,0 +1,132 @@
+<!-- HEADER -->
+      <app-admin-header breadcrumb="Notifications" title="System Notifications" actionButtonTarget="#broadcastModal" actionButtonText="+ Broadcast Notification"></app-admin-header>
+  
+      <!-- DASHBOARD CONTENT -->
+      <div class="dashboard-content" style="padding: 32px;">
+        
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="categoryFilter">Category:</label>
+            <select id="categoryFilter" [(ngModel)]="selectedCategory" (change)="onFilterChange()" class="form-select">
+              <option value="All">All</option>
+              <option value="Announcement">Announcement</option>
+              <option value="System">System</option>
+              <option value="Bookings">Bookings</option>
+              <option value="Payments">Payments</option>
+            </select>
+          </div>
+          
+          <div class="filter-group checkbox-group">
+            <input type="checkbox" id="unreadFilter" [(ngModel)]="unreadOnly" (change)="onFilterChange()">
+            <label for="unreadFilter">Unread only</label>
+          </div>
+        </div>
+
+        <div class="notif-header">
+          <h2>Inbox</h2>
+          <button id="mark-all-read" class="btn btn-outline-primary btn-sm" *ngIf="notifications.length > 0" (click)="markAllAsRead()" [style.display]="hasUnread ? 'inline-block' : 'none'">Mark all as read</button>
+        </div>
+
+        <div id="notifications-container" class="notifications-list">
+          
+          <div class="empty-state" *ngIf="!dbReady">
+            <p>Database connection failed.</p>
+          </div>
+
+          <div class="empty-state" *ngIf="dbReady && paginatedNotifications.length === 0">
+            <div class="empty-state-icon">&#128276;</div>
+            <h4>You're all caught up!</h4>
+            <p>No notifications match your filters.</p>
+          </div>
+
+          <div *ngFor="let n of paginatedNotifications" class="notif-card" [class.unread]="!n.isRead">
+            <div class="notif-icon" [ngClass]="getIconClassAndEmoji(n.category).cls">{{ getIconClassAndEmoji(n.category).emoji }}</div>
+            <div class="notif-content">
+              <div class="notif-title">
+                {{ n.title }}
+                <span class="badge category-badge">{{ n.category }}</span>
+              </div>
+              <div class="notif-message">{{ n.message }}</div>
+              <div class="notif-meta">
+                <span>{{ formatTime(n.createdAt) }}</span>
+                <div class="notif-actions">
+                  <a *ngIf="n.actionText && n.actionUrl" [routerLink]="n.actionUrl" class="btn-action-link">{{ n.actionText }}</a>
+                  <button class="btn-mark-read" *ngIf="!n.isRead" (click)="markAsRead(n.id)">Mark as read</button>
+                  <button class="btn-delete" (click)="deleteNotification(n.id)">Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-footer" *ngIf="totalItems > pageSize">
+          <span class="page-info">Showing {{ (pageNumber - 1) * pageSize + 1 }} to {{ pageNumber * pageSize > totalItems ? totalItems : pageNumber * pageSize }} of {{ totalItems }} entries</span>
+          <div class="pagination-buttons">
+            <button class="btn-page" (click)="prevPage()" [disabled]="pageNumber === 1">&laquo; Prev</button>
+            <span class="current-page">Page {{ pageNumber }} of {{ totalPages }}</span>
+            <button class="btn-page" (click)="nextPage()" [disabled]="pageNumber === totalPages">Next &raquo;</button>
+          </div>
+        </div>
+      </div>
+
+<!-- Broadcast Modal -->
+<div class="modal fade" id="broadcastModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Broadcast Notification</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="resetBroadcastForm()"></button>
+      </div>
+      <div class="modal-body">
+        <form #broadcastForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Title <span class="required-star">*</span></label>
+            <input type="text" class="form-control" name="title" [(ngModel)]="broadcastData.title" #title="ngModel" required [class.is-invalid-custom]="title.invalid && (title.dirty || title.touched)">
+            <div *ngIf="title.invalid && (title.dirty || title.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Message <span class="required-star">*</span></label>
+            <textarea class="form-control" name="message" rows="3" [(ngModel)]="broadcastData.message" #message="ngModel" required [class.is-invalid-custom]="message.invalid && (message.dirty || message.touched)"></textarea>
+            <div *ngIf="message.invalid && (message.dirty || message.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-select" name="category" [(ngModel)]="broadcastData.category">
+              <option value="Announcement">Announcement</option>
+              <option value="System">System</option>
+              <option value="Bookings">Bookings</option>
+              <option value="Payments">Payments</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Target Audience</label>
+            <select class="form-select" name="targetAudience" [(ngModel)]="broadcastData.targetAudience">
+              <option value="AllUsers">All Users</option>
+              <option value="Buyers">Buyers</option>
+              <option value="Admins">Admins</option>
+              <option value="SpecificRole">Specific Role</option>
+              <option value="SpecificUser">Specific User</option>
+            </select>
+          </div>
+          
+          <div class="mb-3" *ngIf="broadcastData.targetAudience === 'SpecificRole'">
+            <label class="form-label">Target Role</label>
+            <input type="text" class="form-control" name="targetRole" [(ngModel)]="broadcastData.targetRole" placeholder="e.g. Sales Manager">
+          </div>
+          
+          <div class="mb-3" *ngIf="broadcastData.targetAudience === 'SpecificUser'">
+            <label class="form-label">Target User ID</label>
+            <input type="text" class="form-control" name="targetUserId" [(ngModel)]="broadcastData.targetUserId" placeholder="User ID">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetBroadcastForm()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="broadcastNotification()" data-bs-dismiss="modal" [disabled]="broadcastForm.invalid">Broadcast</button>
+      </div>
+    </div>
+  </div>
+</div>

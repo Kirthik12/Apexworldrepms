@@ -1,0 +1,122 @@
+<!-- --- TOP BAR OFFERS SLIDER --- -->
+  <!-- HERO SECTION -->
+  <div class="rl-hero">
+    <div class="rl-hero-content">
+      <div class="rl-tag">🌟 Your Voice Matters</div>
+      <h1>Review Lounge</h1>
+      <p>Share your authentic experiences. Whether it's feedback on our platform or a review of your new home, your insights help us build a better real estate ecosystem.</p>
+    </div>
+  </div>
+
+  <div class="rl-page-wrapper">
+    
+    <!-- DUAL TABS -->
+    <div class="rl-tabs">
+      <div class="rl-tab" [class.active]="activeTab === 'platform-review'" (click)="setTab('platform-review')">🌐 Platform Experience</div>
+      <div class="rl-tab" [class.active]="activeTab === 'property-review'" (click)="setTab('property-review')">🏠 My Purchased Properties</div>
+    </div>
+
+    <!-- TAB 1: PLATFORM EXPERIENCE -->
+    <div class="rl-content" [class.active]="activeTab === 'platform-review'">
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <h2>Rate Apex World</h2>
+          <p>How was your experience navigating our portal, searching for properties, and using our digital services?</p>
+        </div>
+        
+        <div class="rl-form">
+          <div class="rl-form-group">
+            <label>Overall Experience</label>
+            <div class="rl-stars" id="platform-stars">
+              <span *ngFor="let star of getPfStars()" 
+                    class="rl-star" 
+                    [class.selected]="star <= pfRating"
+                    (click)="setPfRating(star)">★</span>
+            </div>
+          </div>
+          
+          <div class="rl-form-group">
+            <label>What did you love? (Optional)</label>
+            <div class="rl-chips" id="pf-chips">
+              <span *ngFor="let chip of pfChips" 
+                    class="rl-chip" 
+                    [class.active]="selectedChips.has(chip)"
+                    (click)="toggleChip(chip)">{{ chip }}</span>
+            </div>
+          </div>
+
+          <div class="rl-form-group">
+            <label>Detailed Feedback</label>
+            <textarea class="rl-textarea" rows="4" [(ngModel)]="pfComment" placeholder="Tell us more about your experience with Apex World..."></textarea>
+          </div>
+
+          <button class="rl-btn-submit" (click)="submitPlatformReview()">Submit Platform Review</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: MY PROPERTIES -->
+    <div class="rl-content" [class.active]="activeTab === 'property-review'">
+      <div class="rl-restricted-notice" *ngIf="bookings.length === 0">
+        <div class="rl-restricted-icon">🔒</div>
+        <h3>No Purchased Properties Found</h3>
+        <p>Property reviews are restricted exclusively to verified buyers to maintain absolute authenticity. Once you book or purchase a property, it will appear here for you to review.</p>
+        <button class="rl-btn-outline" routerLink="/buyer-dashboard/properties">Explore Properties</button>
+      </div>
+
+      <div id="rl-purchased-list" *ngIf="bookings.length > 0">
+        <div *ngFor="let prop of bookings" class="rl-purchased-card" (click)="openReviewModal(prop)">
+          <img [src]="getPropImg(prop)" alt="{{ prop.propertyName }}" class="rl-purchased-img">
+          <div class="rl-purchased-info">
+            <div class="rl-purchased-name">{{ prop.propertyName }}</div>
+            <div class="rl-purchased-loc">{{ prop.property?.address || 'India' }}</div>
+            <div class="rl-purchased-status">✓ {{ prop.status }}</div>
+          </div>
+          <button class="rl-btn-review">Write Review</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PROPERTY REVIEW MODAL -->
+  <div class="rl-modal-overlay" [class.show]="isReviewModalOpen">
+    <div class="rl-modal">
+      <div class="rl-modal-close" (click)="closeReviewModal()">✕</div>
+      <div class="rl-modal-header" *ngIf="selectedBooking">
+        <h3>{{ selectedBooking.propertyName }}</h3>
+        <p>{{ selectedBooking.property?.address || 'India' }}</p>
+      </div>
+      
+      <div class="rl-form">
+        <div class="rl-form-group">
+          <label>Rate your property</label>
+          <div class="rl-stars" id="prop-stars">
+            <span *ngFor="let star of getPfStars()" 
+                  class="rl-star" 
+                  [class.selected]="star <= prRating"
+                  (click)="setPrRating(star)">★</span>
+          </div>
+        </div>
+        
+        <div class="rl-form-group">
+          <label>Add Photos (Optional)</label>
+          <div class="rl-photo-upload">
+            <div class="rl-upload-box">
+              <span>+</span>
+              <small>Upload</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="rl-form-group">
+          <label>Write your review</label>
+          <textarea class="rl-textarea" rows="4" [(ngModel)]="prComment" placeholder="How is the build quality, amenities, and neighborhood?"></textarea>
+        </div>
+
+        <button class="rl-btn-submit" (click)="submitPropertyReview()">Submit Property Review</button>
+      </div>
+    </div>
+  </div>
+
+

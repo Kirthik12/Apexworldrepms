@@ -1,0 +1,166 @@
+<header class="admin-top-header">
+  <div class="top-header-tier1">
+    <div class="breadcrumb">
+      <a routerLink="/admin-dashboard" style="text-decoration:none;"><span class="highlight">Admin Workspace</span></a> / Help Center
+    </div>
+    <div class="tier1-actions">
+      <div class="top-search-bar">
+        <span class="icon">🔍</span>
+        <input type="text" placeholder="Search content...">
+      </div>
+      <div class="avatar-circle">AD</div>
+    </div>
+  </div>
+  <div class="top-header-tier2">
+    <h2 class="page-title">Help Center</h2>
+    <button class="btn-primary-header" data-bs-toggle="modal" data-bs-target="#createFaqModal">+ Create New FAQ</button>
+  </div>
+</header>
+
+<div class="hc-layout">
+  
+  <!-- LEFT COLUMN (Main Help Content) -->
+  <div class="hc-main-col">
+    
+    <div class="hc-section hero-section">
+      <h1 class="hero-title">How can we help you</h1>
+      <p class="hero-sub">Search guides, tutorials, FAQs and system documentation.</p>
+      
+      <div class="hero-search-box">
+        <span class="icon">🔍</span>
+        <input type="text" placeholder="Search for help articles, topics or keywords,...">
+      </div>
+
+      <div class="popular-searches">
+        <h4>Popular Searches</h4>
+        <div class="tags">
+          <a routerLink="/admin-dashboard/property-management" class="tag" style="text-decoration:none;">Add Property</a>
+          <a routerLink="/admin-dashboard/report-management" class="tag" style="text-decoration:none;">Reports</a>
+          <a routerLink="/admin-dashboard/backup-management" class="tag" style="text-decoration:none;">Backup</a>
+          <a routerLink="/admin-dashboard/loan-management" class="tag" style="text-decoration:none;">Loan Approval</a>
+          <a routerLink="/admin-dashboard/booking-management" class="tag" style="text-decoration:none;">Bookings</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help Modules -->
+    <div class="hc-section">
+      <div class="section-header">
+        <h3>Help Modules</h3>
+      </div>
+      
+      <div class="module-grid">
+        <a routerLink="/admin-dashboard/property-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4>Property Management</h4>
+          <p>Manage listings, bulk upload, edit properties, close listings and more.</p>
+        </a>
+        <a routerLink="/admin-dashboard/site-visit-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4> Site-Visit Management</h4>
+          <p>Manage buyer records, contact details, and platform interactions.</p>
+        </a>
+        <a routerLink="/admin-dashboard/booking-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4>Booking Management</h4>
+          <p>Schedule visits, track reservations, and manage the booking lifecycle.</p>
+        </a>
+        <a routerLink="/admin-dashboard/loan-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4>Loan Management</h4>
+          <p>Process buyer loan applications, review EMI plans, and approve financing.</p>
+        </a>
+        <a routerLink="/admin-dashboard/backup-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4>Backup & Recovery</h4>
+          <p>Manage system snapshots, restore data, and ensure disaster recovery.</p>
+        </a>
+        <a routerLink="/admin-dashboard/content-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4>Content Management</h4>
+          <p>Configure website banners, global announcements, and system alerts.</p>
+        </a>
+        <a routerLink="/admin-dashboard/report-management" class="module-card" style="text-decoration:none; color:inherit;">
+          <h4>Report Management</h4>
+          <p>Generate financial analytics, export KPIs, and schedule revenue reports.</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- FAQs & Content Help -->
+    <div class="hc-row-section">
+      <div class="hc-half" style="width: 100%;">
+        <h3>Frequently Asked Questions</h3>
+        <div class="faq-list">
+          <div class="faq-wrapper" *ngFor="let faq of faqs; let i = index">
+            <div class="faq-item" [class.active]="faq.active" (click)="toggleFaq(i)">
+              <span>{{ faq.question }}</span>
+              <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer" [style.display]="faq.active ? 'block' : 'none'">
+              {{ faq.answer }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN (Sidebar Actions) -->
+  <div class="hc-side-col">
+    
+    <div class="side-card">
+      <h3>Quick Actions</h3>
+      <button class="action-btn" data-bs-toggle="modal" data-bs-target="#createFaqModal">Create FAQs</button>
+      <a routerLink="/admin-dashboard/report-management" class="action-btn" style="text-decoration:none; display:block; text-align:center; color: #1E293B;">Generate Report</a>
+      <a routerLink="/admin-dashboard/backup-management" class="action-btn" style="text-decoration:none; display:block; text-align:center; color: #1E293B;">Backup Now</a>
+    </div>
+
+    <div class="side-card">
+      <h3>System Status</h3>
+      <ul class="status-list">
+        <li>Knowledge base status</li>
+        <li>Help center Status</li>
+        <li>Backup status</li>
+        <li>Reports Engine Status</li>
+        <li>Content Engine Status</li>
+        <li>Notification Engine Status</li>
+      </ul>
+    </div>
+
+    <div class="side-card">
+      <h3>Need More Help?</h3>
+      <p class="sub">Contact our support team</p>
+      <button class="support-btn">Email Support</button>
+      <button class="support-btn">Live chat</button>
+      <button class="support-btn">SMS Support</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Create FAQ Modal -->
+<div class="modal fade" id="createFaqModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background-color: var(--card-bg, #fff);">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New FAQ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createFaq(faqQuestion.value, faqAnswer.value); faqQuestion.value=''; faqAnswer.value=''" #faqForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Question <span class="required-star">*</span></label>
+            <input type="text" class="form-control" #faqQuestion #faqQuestionModel="ngModel" ngModel name="question" required [class.is-invalid-custom]="faqQuestionModel.invalid && (faqQuestionModel.dirty || faqQuestionModel.touched)">
+            <div *ngIf="faqQuestionModel.invalid && (faqQuestionModel.dirty || faqQuestionModel.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Answer <span class="required-star">*</span></label>
+            <textarea class="form-control" #faqAnswer #faqAnswerModel="ngModel" ngModel name="answer" rows="3" required [class.is-invalid-custom]="faqAnswerModel.invalid && (faqAnswerModel.dirty || faqAnswerModel.touched)"></textarea>
+            <div *ngIf="faqAnswerModel.invalid && (faqAnswerModel.dirty || faqAnswerModel.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="faqForm.invalid">Save FAQ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

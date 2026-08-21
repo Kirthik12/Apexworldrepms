@@ -1,0 +1,228 @@
+<app-admin-header breadcrumb="Loan Management" title="Loan Origination"></app-admin-header>
+
+<div class="lm-content-area">
+  
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card highlight-border-blue">
+      <p class="kpi-label">TOTAL APPLICATIONS</p>
+      <h2 class="kpi-value" id="kpi-total">{{ totalApps }} Loan Files</h2>
+    </div>
+    <div class="kpi-card highlight-border-orange">
+      <p class="kpi-label">UNDERWRITING QUEUE</p>
+      <h2 class="kpi-value" id="kpi-queue">{{ pendingApps }} Pending</h2>
+    </div>
+    <div class="kpi-card highlight-border-green">
+      <p class="kpi-label">TOTAL FUNDED CAPITAL</p>
+      <h2 class="kpi-value" id="kpi-funded">INR {{ totalFunded | number:'1.2-2' }}</h2>
+    </div>
+  </div>
+
+  <!-- Filters Row -->
+  <div class="filter-row">
+    <div class="search-bar" style="width: 450px;">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="lm-table-search" placeholder="Search by Application ID, buyer name, property target...">
+    </div>
+    <div class="filter-dropdowns">
+      <select id="filter-status" class="filter-select">
+        <option value="">Status: All</option>
+        <option value="Approved">Status: Approved</option>
+        <option value="Pending">Status: Pending</option>
+        <option value="Rejected">Status: Rejected</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Directory Section -->
+  <div class="directory-section" style="overflow-x: auto;">
+    <div class="agy-table-container">
+      <div class="agy-table-title">Loan Applications Underwriting Moderation Queue</div>
+      
+      <table class="agy-table" style="min-width: 1300px;">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="chk-all"></th>
+            <th>Loan ID</th>
+            <th>Buyer</th>
+            <th>Property</th>
+            <th>Principal (INR)</th>
+            <th>Rate %</th>
+            <th>Tenure</th>
+            <th>EMI (INR)</th>
+            <th>Bank</th>
+            <th>Date Applied</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="loan-list">
+          <!-- Empty State -->
+          <tr *ngIf="loans.length === 0">
+            <td colspan="12">
+              <div class="empty-state">
+                <div class="empty-state-icon">🏦</div>
+                <p class="empty-state-title">No loan applications found</p>
+                <p class="empty-state-desc">Loan applications will appear here once submitted.</p>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngFor="let item of loans">
+            <td><input type="checkbox" class="row-chk"></td>
+            <td style="font-weight: 700; color: #1E3A8A;">#{{ item.id }}</td>
+            <td style="font-weight: 600;">{{ item.buyerName }}</td>
+            <td style="font-weight: 600;" title="{{ item.propertyName }}">{{ item.propertyName }}</td>
+            <td style="font-weight: 700;">INR {{ item.loanAmount | number:'1.2-2' }}</td>
+            <td>{{ item.interestRate | number:'1.2-2' }}%</td>
+            <td>{{ item.tenure }} Yrs</td>
+            <td style="font-weight: 700; color: #059669;">INR {{ item.monthlyEmi | number:'1.2-2' }}</td>
+            <td style="color: #475569;">{{ item.bankName }}</td>
+            <td>{{ item.createdAt | date:'dd MMM yyyy' }}</td>
+            <td>
+              <span class="status-badge"
+                [class.approved]="item.status === 'Approved'"
+                [class.rejected]="item.status === 'Rejected'"
+                [class.pending]="item.status === 'Pending'">
+                {{ item.status }}
+              </span>
+            </td>
+            <td style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+              <button class="action-btn action-neutral lm-action-sm" (click)="viewDetails(item)" title="View Details" aria-label="View loan details">
+                👁️ Details
+              </button>
+              <ng-container *ngIf="item.status === 'Pending'">
+                <button class="action-btn action-approve lm-action-sm" (click)="promptStatusUpdate(item.id, 'Approved')" title="Approve loan" aria-label="Approve loan application">
+                  ✓ Approve
+                </button>
+                <button class="action-btn action-reject lm-action-sm" (click)="promptStatusUpdate(item.id, 'Rejected')" title="Reject loan" aria-label="Reject loan application">
+                  ✕ Reject
+                </button>
+              </ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="agy-table-pagination">
+        <div class="agy-table-pagination-controls">
+          <app-pagination 
+            [currentPage]="pageNumber" 
+            [totalItems]="totalItems" 
+            [pageSize]="pageSize" 
+            (pageChange)="onPageChange($event)">
+          </app-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="bm-modal-overlay" [class.show]="showDetailsModal" id="details-modal" role="dialog" aria-modal="true" aria-labelledby="loan-details-title">
+  <div class="bm-modal-content" style="width: 600px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden;">
+    <!-- Header -->
+    <div class="receipt-modal-header">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="receipt-icon-box">🏦</div>
+        <div>
+          <h3 id="loan-details-title" style="margin: 0; font-weight: 700; font-size: 1.15rem; color: #fff;">Loan Application Details</h3>
+          <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.7);">Apex World REPMS</p>
+        </div>
+      </div>
+      <button (click)="closeDetailsModal()" class="modal-close-btn" aria-label="Close modal">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div *ngIf="selectedLoan" style="padding: 24px; font-size: 0.9rem; color: #334155; line-height: 1.6; max-height: 70vh; overflow-y: auto; flex: 1;">
+      
+      <!-- Applicant Information -->
+      <div class="detail-section">
+        <h4 class="detail-section-title">Applicant Details</h4>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-label">Buyer ID</span><strong>USR-{{ selectedLoan.buyerId }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Buyer Name</span><strong>{{ selectedLoan.buyerName }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Email</span><strong>{{ selectedLoan.email }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Phone</span><strong>{{ selectedLoan.phone }}</strong></div>
+          <div class="detail-row span-2"><span class="detail-label">Address</span><strong>{{ selectedLoan.address }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Employment</span><strong>{{ selectedLoan.employmentType }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Monthly Income</span><strong>INR {{ selectedLoan.monthlyIncome | number:'1.2-2' }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Property Information -->
+      <div class="detail-section">
+        <h4 class="detail-section-title">Property Details</h4>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-label">Property ID</span><strong>PROP-{{ selectedLoan.propertyId }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Property Name</span><strong>{{ selectedLoan.propertyName }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Property Value</span><strong>INR {{ selectedLoan.propertyValue | number:'1.2-2' }}</strong></div>
+          <div class="detail-row span-2"><span class="detail-label">Location</span><strong>{{ selectedLoan.propertyAddress }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Loan Details -->
+      <div class="detail-section">
+        <h4 class="detail-section-title">Financial & Loan Details</h4>
+        <div class="detail-grid">
+          <div class="detail-row"><span class="detail-label">Principal Amount</span><strong>INR {{ selectedLoan.loanAmount | number:'1.2-2' }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Interest Rate</span><strong>{{ selectedLoan.interestRate | number:'1.2-2' }}% p.a.</strong></div>
+          <div class="detail-row"><span class="detail-label">Tenure</span><strong>{{ selectedLoan.tenure }} Years</strong></div>
+          <div class="detail-row"><span class="detail-label">Monthly EMI</span><strong style="color:#059669;">INR {{ selectedLoan.monthlyEmi | number:'1.2-2' }} /mo</strong></div>
+          <div class="detail-row"><span class="detail-label">Bank</span><strong>{{ selectedLoan.bankName }}</strong></div>
+          <div class="detail-row"><span class="detail-label">Loan Purpose</span><strong>Home Purchase</strong></div>
+          <div class="detail-row"><span class="detail-label">Application Date</span><strong>{{ selectedLoan.createdAt | date:'mediumDate' }}</strong></div>
+          <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="status-badge"
+              [class.approved]="selectedLoan.status === 'Approved'"
+              [class.rejected]="selectedLoan.status === 'Rejected'"
+              [class.pending]="selectedLoan.status === 'Pending'">
+              {{ selectedLoan.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="receipt-modal-footer">
+      <button (click)="closeDetailsModal()" class="action-btn action-secondary">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Action Modal -->
+<div class="bm-modal-overlay" [class.show]="showConfirmModal" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+  <div class="bm-modal-content" style="width: 440px; border-radius: 16px; overflow: hidden;">
+    <!-- Header -->
+    <div class="receipt-modal-header" [style.background]="pendingAction === 'Approved' ? 'linear-gradient(135deg,#065F46,#059669)' : 'linear-gradient(135deg,#7F1D1D,#DC2626)'">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size:1.6rem;">{{ pendingAction === 'Approved' ? '✓' : '✕' }}</span>
+        <h3 id="confirm-modal-title" style="margin: 0; font-weight: 700; font-size: 1.1rem; color: #fff;">
+          {{ pendingAction === 'Approved' ? 'Approve Loan Application?' : 'Reject Loan Application?' }}
+        </h3>
+      </div>
+      <button (click)="closeConfirmModal()" class="modal-close-btn" aria-label="Close">✕</button>
+    </div>
+    <!-- Body -->
+    <div style="padding: 24px; font-size: 0.95rem; color: #334155;">
+      <p style="margin: 0; line-height: 1.6;">
+        {{ pendingAction === 'Approved' 
+          ? 'Are you sure you want to approve this loan application? The applicant will be notified of the decision.' 
+          : 'Are you sure you want to reject this loan application? This action will notify the applicant.' }}
+      </p>
+    </div>
+    <!-- Footer -->
+    <div class="receipt-modal-footer">
+      <button (click)="closeConfirmModal()" class="action-btn action-secondary">Cancel</button>
+      <button (click)="executeStatusUpdate()" class="action-btn" 
+        [class.action-approve]="pendingAction === 'Approved'"
+        [class.action-reject]="pendingAction === 'Rejected'"
+        [disabled]="isProcessing">
+        {{ isProcessing ? 'Processing...' : (pendingAction === 'Approved' ? '✓ Yes, Approve' : '✕ Yes, Reject') }}
+      </button>
+    </div>
+  </div>
+</div>

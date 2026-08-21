@@ -1,0 +1,179 @@
+<!-- DASHBOARD CONTENT -->
+<div *ngIf="isLoading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50vh; color: #64748b;">
+  <div style="border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 16px;">
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+  </div>
+  <p>Loading dashboard data...</p>
+</div>
+
+<div *ngIf="!isLoading">
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card" data-kpi="listings" style="cursor: pointer; position: relative;" routerLink="/admin-dashboard/admin-property-management">
+      <div class="kpi-icon listings-icon">🏢</div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="val-listings">{{ activeListings }}</div>
+        <div class="kpi-label">Active Listings</div>
+        <div class="kpi-trend positive">{{ listingsTrend }}</div>
+      </div>
+      <a routerLink="/admin-dashboard/admin-property-management" class="module-link" title="View Module">↗</a>
+    </div>
+    <div class="kpi-card highlight" data-kpi="revenue" style="cursor: pointer; position: relative;" routerLink="/admin-dashboard/payment-management">
+      <div class="kpi-icon revenue-icon">💰</div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="val-revenue">{{ totalRevenue }}</div>
+        <div class="kpi-label">Total Completed Revenue</div>
+        <div class="kpi-trend positive">{{ revenueTrend }}</div>
+      </div>
+      <a routerLink="/admin-dashboard/payment-management" class="module-link" title="View Module">↗</a>
+    </div>
+    <div class="kpi-card" data-kpi="loans" style="cursor: pointer; position: relative;" routerLink="/admin-dashboard/loan-management">
+      <div class="kpi-icon loans-icon">📝</div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="val-loans">{{ pendingLoans }}</div>
+        <div class="kpi-label">Pending Loan Applications</div>
+        <div class="kpi-trend neutral">{{ loansTrend }}</div>
+      </div>
+      <a routerLink="/admin-dashboard/loan-management" class="module-link" title="View Module">↗</a>
+    </div>
+    <div class="kpi-card" data-kpi="enquiries" style="cursor: pointer; position: relative;" routerLink="/admin-dashboard/review-management">
+      <div class="kpi-icon tickets-icon">🎫</div>
+      <div class="kpi-data">
+        <div class="kpi-value" id="val-enquiries">{{ unresolvedEnquiries }}</div>
+        <div class="kpi-label">Unresolved Enquiries</div>
+        <div class="kpi-trend negative">{{ enquiriesTrend }}</div>
+      </div>
+      <a routerLink="/admin-dashboard/review-management" class="module-link" title="View Module">↗</a>
+    </div>
+  </div>
+
+  <!-- CHARTS SECTION -->
+  <div class="charts-grid">
+    <!-- Revenue Trend -->
+    <div class="chart-section panel-card">
+      <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="trend-title">Revenue Performance Trend</h2>
+        <div class="time-filters">
+          <button class="time-filter-btn" data-time="daily">Daily</button>
+          <button class="time-filter-btn" data-time="weekly">Weekly</button>
+          <button class="time-filter-btn active" data-time="monthly">Monthly</button>
+        </div>
+      </div>
+      <div id="chart-type-filters" style="display: flex; gap: 12px; margin-top: 16px; margin-bottom: 20px;">
+        <button class="chart-type-btn active" data-type="line" style="padding: 6px 16px; border-radius: 20px; border: 1px solid #F59E0B; background: #FEF3C7; color: #D97706; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);">📈 Trend (Line)</button>
+        <button class="chart-type-btn" data-type="bar" style="padding: 6px 16px; border-radius: 20px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #64748B; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; transition: 0.2s;">📊 Volume (Bar)</button>
+        <button class="chart-type-btn" data-type="area" style="padding: 6px 16px; border-radius: 20px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #64748B; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; transition: 0.2s;">🌊 Growth (Area)</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Property Distribution -->
+    <div class="chart-section panel-card">
+      <div class="panel-header">
+        <h2>Property Category Distribution</h2>
+      </div>
+      <div class="chart-container">
+        <canvas id="propertyTypeChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Booking Statuses -->
+    <div class="chart-section panel-card" style="grid-column: 1 / -1;">
+      <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Booking Status Overview</h2>
+        <div class="time-filters">
+          <button class="time-filter-btn booking-filter" data-time="daily">Daily</button>
+          <button class="time-filter-btn booking-filter" data-time="weekly">Weekly</button>
+          <button class="time-filter-btn booking-filter active" data-time="monthly">Monthly</button>
+        </div>
+      </div>
+      <div class="chart-container" style="height: 250px;">
+        <canvas id="bookingStatusChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKINGS LEDGER -->
+  <div class="ledger-section panel-card">
+    <div class="panel-header">
+      <h2>Active Booking Reservations Moderation Ledger</h2>
+      <button class="btn-outline-sm" routerLink="/admin-dashboard/booking-management">View All</button>
+    </div>
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Property Name</th>
+            <th>Buyer</th>
+            <th>Price / Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="recentBookings.length === 0">
+            <td colspan="5" style="text-align:center; padding:24px; color:#94A3B8;">No active bookings found.</td>
+          </tr>
+          <tr *ngFor="let b of recentBookings">
+            <td><strong>{{ b.id || b.bookingId }}</strong></td>
+            <td>{{ b.propertyTitle || b.property }}</td>
+            <td>{{ b.buyerName || b.buyer }}</td>
+            <td>{{ b.price || b.amount }}</td>
+            <td>
+              <span class="status-badge"
+                [class.approved]="b.status === 'Approved' || b.status === 'Paid'"
+                [class.pending]="b.status === 'Pending'"
+                [class.rejected]="b.status === 'Cancelled' || b.status === 'Rejected'">
+                {{ b.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAYMENTS LEDGER -->
+  <div class="ledger-section panel-card">
+    <div class="panel-header">
+      <h2>Recent Payments Ledger</h2>
+      <button class="btn-outline-sm" routerLink="/admin-dashboard/payment-management">View All</button>
+    </div>
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>TXN ID</th>
+            <th>Booking Ref</th>
+            <th>Property</th>
+            <th>Buyer</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="recentPayments.length === 0">
+            <td colspan="6" style="text-align:center; padding:24px; color:#94A3B8;">No recent payments found.</td>
+          </tr>
+          <tr *ngFor="let p of recentPayments">
+            <td><strong>{{ p.transactionId || p.paymentId }}</strong></td>
+            <td>{{ p.bookingId }}</td>
+            <td>{{ p.propertyTitle }}</td>
+            <td>{{ p.payerName }}</td>
+            <td>{{ p.amount }}</td>
+            <td>
+              <span class="status-badge"
+                [class.approved]="p.status === 'Completed' || p.status === 'Success'"
+                [class.pending]="p.status === 'Pending'"
+                [class.rejected]="p.status === 'Failed' || p.status === 'Error'">
+                {{ p.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

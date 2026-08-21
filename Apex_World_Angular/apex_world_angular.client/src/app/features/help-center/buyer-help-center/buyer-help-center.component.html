@@ -1,0 +1,94 @@
+<div class="hc-page-container">
+  <!-- Hero Section -->
+  <div class="hc-hero">
+    <div class="hc-hero-content">
+      <h1>How can we help you today?</h1>
+      <p>Search our knowledge base or browse categories below to find the answers you need.</p>
+      <div class="hc-search-wrapper">
+        <span class="hc-search-icon">🔍</span>
+        <input 
+          type="text" 
+          placeholder="Search for articles, questions, or topics..." 
+          [(ngModel)]="searchQuery" 
+          (input)="onSearch()"
+          class="hc-search-input">
+        <button *ngIf="searchQuery" class="hc-search-clear" (click)="clearSearch()" title="Clear filter">
+          ✖
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Categories -->
+  <div class="hc-categories-section">
+    <h2 class="hc-section-title">Quick Categories</h2>
+    <div class="hc-categories-grid">
+      <div class="hc-category-card" (click)="filterByCategory('Account')">
+        <div class="hc-category-icon">👤</div>
+        <h3>Account & Profile</h3>
+        <p>Manage your account settings, password, and personal details.</p>
+      </div>
+      <div class="hc-category-card" (click)="filterByCategory('Property')">
+        <div class="hc-category-icon">🏠</div>
+        <h3>Property Search</h3>
+        <p>Learn how to search, filter, and save properties to your wishlist.</p>
+      </div>
+      <div class="hc-category-card" (click)="filterByCategory('Booking')">
+        <div class="hc-category-icon">📅</div>
+        <h3>Site Visits</h3>
+        <p>Information on scheduling, modifying, or canceling site visits.</p>
+      </div>
+      <div class="hc-category-card" (click)="filterByCategory('Payment')">
+        <div class="hc-category-icon">💳</div>
+        <h3>Payments & Loans</h3>
+        <p>Details about token advances, payment methods, and the EMI calculator.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="hc-faq-section">
+    <h2 class="hc-section-title">Frequently Asked Questions</h2>
+    
+    <div class="hc-no-results" *ngIf="filteredFaqs.length === 0">
+      <div class="hc-no-results-icon">😕</div>
+      <h3>No results found</h3>
+      <p>We couldn't find any FAQs matching "{{ searchQuery }}". Try different keywords or contact support below.</p>
+      <button class="hc-btn-primary hc-btn-small" (click)="searchQuery=''; onSearch()">View All FAQs</button>
+    </div>
+
+    <div class="hc-accordion">
+      <div class="hc-accordion-item" 
+           *ngFor="let faq of filteredFaqs" 
+           [class.active]="faq.expanded"
+           (click)="toggleFaq(faq)">
+        <div class="hc-accordion-header">
+          <span class="hc-faq-category">{{ faq.category }}</span>
+          <h4 class="hc-faq-question">{{ faq.question }}</h4>
+          <span class="hc-accordion-icon">{{ faq.expanded ? '−' : '+' }}</span>
+        </div>
+        <div class="hc-accordion-body" *ngIf="faq.expanded">
+          <p>{{ faq.answer }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Support -->
+  <div class="hc-contact-section">
+    <div class="hc-contact-card">
+      <div class="hc-contact-icon">📞</div>
+      <h3>Still need help?</h3>
+      <p>Our support team is available Monday to Friday, 9 AM to 6 PM to assist you.</p>
+      <div class="hc-contact-methods">
+        <div class="hc-contact-method">
+          <strong>Email:</strong> support@apexworld.com
+        </div>
+        <div class="hc-contact-method">
+          <strong>Phone:</strong> 1-800-APEX-HLP
+        </div>
+      </div>
+      <button class="hc-btn-primary">Contact Us Now</button>
+    </div>
+  </div>
+</div>

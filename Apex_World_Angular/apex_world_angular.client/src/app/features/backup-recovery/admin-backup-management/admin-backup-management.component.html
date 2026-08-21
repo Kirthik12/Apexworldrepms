@@ -1,0 +1,599 @@
+<app-admin-header 
+  breadcrumb="Backup & Recovery" 
+  title="Backup & Recovery" 
+  actionButtonText="⚡ Backup Now" 
+  (actionClick)="openBackupModal()">
+</app-admin-header>
+
+<div style="display:flex; justify-content:flex-end; gap:10px; padding: 16px 32px 0; background-color: #F8FAFC;">
+  <button style="padding:9px 16px; border:1px solid #CBD5E1; background:#fff; border-radius:8px; cursor:pointer; font-weight:600; color:#475569;" (click)="loadAll()">🔄 Refresh</button>
+  <button style="padding:9px 16px; border:1px solid #CBD5E1; background:#fff; border-radius:8px; cursor:pointer; font-weight:600; color:#475569;" (click)="setTab('tab-schedules')">📅 Schedule</button>
+</div>
+
+<div class="rm-content-area">
+  
+  <!-- KPI Row -->
+  <div class="kpi-row redesigned-kpis" style="margin-bottom: 24px;">
+    <div class="kpi-card clickable">
+      <div class="kpi-top">
+        <div class="kpi-icon tint-blue">&#128190;</div>
+        <p>Total Backups</p>
+      </div>
+      <h3>{{ totalCount }}</h3>
+      <span class="kpi-trend trend-up">&#9650; All time logs</span>
+    </div>
+    <div class="kpi-card clickable">
+      <div class="kpi-top">
+        <div class="kpi-icon tint-green">&#9989;</div>
+        <p>Successful Backups</p>
+      </div>
+      <h3>{{ successCount }}</h3>
+      <span class="kpi-trend trend-up">&#9650; {{ healthScore }} Success Rate</span>
+    </div>
+    <div class="kpi-card clickable">
+      <div class="kpi-top">
+        <div class="kpi-icon tint-red">&#10060;</div>
+        <p>Failed Backups</p>
+      </div>
+      <h3>{{ failedCount }}</h3>
+      <span class="kpi-trend trend-down">&#9660; Requires attention</span>
+    </div>
+    <div class="kpi-card clickable">
+      <div class="kpi-top">
+        <div class="kpi-icon tint-yellow">&#128193;</div>
+        <p>Used Storage</p>
+      </div>
+      <h3>{{ statusKpi.usedStorageGB | number:'1.1-2' }} GB</h3>
+      <span class="kpi-trend trend-up">&#9650; of {{ statusKpi.totalStorageGB }} GB total</span>
+    </div>
+    <div class="kpi-card clickable">
+      <div class="kpi-top">
+        <div class="kpi-icon tint-blue2">&#128338;</div>
+        <p>Last Backup</p>
+      </div>
+      <h3 style="font-size:1.1rem;">{{ statusKpi.lastBackupDate ? (statusKpi.lastBackupDate | date:'mediumDate') : 'None' }}</h3>
+      <span class="kpi-trend" style="color:#64748B;">{{ statusKpi.status }}</span>
+    </div>
+    <div class="kpi-card clickable">
+      <div class="kpi-top">
+        <div class="kpi-icon tint-green">&#10084;&#65039;</div>
+        <p>Backup Health</p>
+      </div>
+      <h3>{{ healthScore }}</h3>
+      <span class="kpi-trend trend-up">&#9650; Optimal health score</span>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="bk-tabs-bar" style="margin-bottom: 24px;">
+    <div class="tabs modern-tabs">
+      <button class="tab" [class.active]="activeTab === 'tab-overview'" (click)="setTab('tab-overview')">Backup Overview</button>
+      <button class="tab" [class.active]="activeTab === 'tab-schedules'" (click)="setTab('tab-schedules')">Backup Schedules</button>
+      <button class="tab" [class.active]="activeTab === 'tab-history'" (click)="setTab('tab-history')">Restore History</button>
+      <button class="tab" [class.active]="activeTab === 'tab-policies'" (click)="setTab('tab-policies')">Retention Policies</button>
+      <button class="tab" [class.active]="activeTab === 'tab-settings'" (click)="setTab('tab-settings')">Backup Settings</button>
+    </div>
+  </div>
+
+  <!-- Content Split -->
+  <div class="bk-content-split layout-grid">
+    
+    <!-- Left Main Area -->
+    <div class="bk-main-col">
+      
+      <!-- TAB 1: OVERVIEW -->
+      <div id="tab-overview" class="tab-content" [class.active]="activeTab === 'tab-overview'" [style.display]="activeTab === 'tab-overview' ? 'block' : 'none'">
+        <div class="agy-table-container" style="margin-bottom: 24px;">
+          <div class="agy-table-title" style="display: flex; align-items: center; justify-content: space-between;">
+            <h3 style="margin:0; font-size: 1.1rem; color: var(--text);">Recent Backups</h3>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <select class="cr-select" style="font-size:0.8rem; padding:6px 10px;" [(ngModel)]="filterStatus" (change)="applyFilters()">
+                <option value="">All Status</option>
+                <option value="Success">Success</option>
+                <option value="Failed">Failed</option>
+              </select>
+              <select class="cr-select" style="font-size:0.8rem; padding:6px 10px;" [(ngModel)]="filterType" (change)="applyFilters()">
+                <option value="">All Types</option>
+                <option value="Full">Full</option>
+                <option value="Differential">Differential</option>
+                <option value="Log">Log</option>
+              </select>
+              <button *ngIf="filterStatus || filterType" style="padding:6px 10px; border:1px solid #CBD5E1; background:#fff; border-radius:6px; cursor:pointer; font-size:0.8rem; color:#475569;" (click)="resetFilters()">Clear</button>
+            </div>
+          </div>
+          <table class="agy-table">
+            <thead>
+              <tr>
+                <th>Backup Name</th>
+                <th>Type</th>
+                <th>Data Included</th>
+                <th>Size</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="isLoading">
+                <td colspan="7" style="text-align:center; padding:32px; color:#64748B;">⏳ Loading backup history...</td>
+              </tr>
+              <tr *ngIf="!isLoading && filteredBackups.length === 0">
+                <td colspan="7" style="text-align:center; padding:32px; color:#64748B;">No backup records found. Click "⚡ Backup Now" to create your first backup.</td>
+              </tr>
+              <tr *ngFor="let b of paginatedBackups">
+                <td style="font-weight:600; color:#1E293B; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" [title]="b.backupName">{{ b.backupName }}</td>
+                <td><span class="status" [ngClass]="getTypeClass(b.backupType)">{{ b.backupType }}</span></td>
+                <td style="color:#64748B;">{{ b.includeData }}</td>
+                <td>{{ formatFileSize(b.fileSize) }}</td>
+                <td>{{ b.createdAt | date:'medium' }}</td>
+                <td><span class="status" [ngClass]="getStatusClass(b.status)">{{ b.status }}</span></td>
+                <td>
+                  <a href="javascript:void(0)" class="action-link view-btn" (click)="viewBackup(b)">View</a>
+                  <a href="javascript:void(0)" class="action-link restore-btn" (click)="restoreBackup(b)" *ngIf="b.status === 'Success'">Restore</a>
+                  <a href="javascript:void(0)" class="action-link" style="color:#10B981;" (click)="downloadBackup(b.id)" *ngIf="b.status === 'Success'">Download</a>
+                  <a href="javascript:void(0)" class="action-link delete-btn" style="color:#EF4444" (click)="promptDelete(b.id)">Delete</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="agy-table-pagination">
+            <div class="agy-table-pagination-controls">
+              <app-pagination 
+                [currentPage]="currentPage" 
+                [totalItems]="filteredBackups.length" 
+                [pageSize]="itemsPerPage" 
+                (pageChange)="onPageChange($event)">
+              </app-pagination>
+            </div>
+          </div>
+        </div>
+
+        <div class="bk-mini-cards">
+          <div class="agy-table-container" style="grid-column: span 3;">
+            <div class="agy-table-title">
+              Backup Retention Overview
+            </div>
+            <table class="agy-table">
+              <thead>
+                <tr>
+                  <th>Backup Type</th>
+                  <th>Retention Period</th>
+                  <th>Count (Success)</th>
+                  <th>Total Size</th>
+                  <th>Retention Until</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="backups.length === 0">
+                  <td colspan="5" style="text-align:center; padding:32px; color:#64748B;">No retention data available yet.</td>
+                </tr>
+                <tr *ngIf="backups.length > 0">
+                  <td>Full</td>
+                  <td>{{ settings.retentionDays }} days</td>
+                  <td>{{ fullBackupCount }}</td>
+                  <td>{{ totalSizeStr }}</td>
+                  <td>{{ settings.retentionDays }} days from creation</td>
+                </tr>
+                <tr *ngIf="backups.length > 0">
+                  <td>Differential</td>
+                  <td>{{ settings.retentionDays }} days</td>
+                  <td>{{ diffBackupCount }}</td>
+                  <td>—</td>
+                  <td>{{ settings.retentionDays }} days from creation</td>
+                </tr>
+                <tr *ngIf="backups.length > 0">
+                  <td>Log (Incremental)</td>
+                  <td>{{ settings.retentionDays }} days</td>
+                  <td>{{ logBackupCount }}</td>
+                  <td>—</td>
+                  <td>{{ settings.retentionDays }} days from creation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TAB 2: SCHEDULES -->
+      <div id="tab-schedules" class="tab-content" [class.active]="activeTab === 'tab-schedules'" [style.display]="activeTab === 'tab-schedules' ? 'block' : 'none'">
+        <div class="cat-card table-card" style="padding:0;">
+          <div class="cat-header" style="padding: 20px 24px; margin: 0; border-bottom: 1px solid var(--border);">
+            <div style="display:flex; flex-direction:column;">
+              <h3 style="margin:0 0 4px 0; font-size: 1.1rem; color: var(--text);">Automated Backup Schedules</h3>
+              <p style="margin:0; font-size:0.85rem; color:var(--muted);">Configure automated backup routines to ensure data safety without manual intervention.</p>
+            </div>
+          </div>
+          <div style="padding: 24px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; max-width:600px;">
+              <div class="form-group">
+                <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Frequency</label>
+                <select class="cr-select" [(ngModel)]="settings.frequency">
+                  <option value="Daily">Daily</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="Monthly">Monthly</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Backup Type</label>
+                <select class="cr-select" [(ngModel)]="settings.backupType">
+                  <option value="Full">Full</option>
+                  <option value="Differential">Differential</option>
+                  <option value="Log">Log (Incremental)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Backup Time (UTC)</label>
+                <input type="time" class="cr-input" [(ngModel)]="settings.backupTime">
+              </div>
+              <div class="form-group">
+                <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Enabled</label>
+                <select class="cr-select" [(ngModel)]="settings.isEnabled">
+                  <option [ngValue]="true">Yes — Active</option>
+                  <option [ngValue]="false">No — Paused</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:8px; padding:12px; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; font-size:0.85rem; color:#166534; max-width:600px;" *ngIf="settings.isEnabled">
+              ✅ Automated <strong>{{ settings.backupType }}</strong> backup is scheduled to run <strong>{{ settings.frequency }}</strong> at <strong>{{ settings.backupTime }} UTC</strong>.
+            </div>
+            <div style="margin-top:8px; padding:12px; background:#FEF9C3; border:1px solid #FDE68A; border-radius:8px; font-size:0.85rem; color:#854D0E; max-width:600px;" *ngIf="!settings.isEnabled">
+              ⚠️ Automated scheduling is currently <strong>paused</strong>. Enable it to resume automatic backups.
+            </div>
+            <button class="btn-primary action-btn" style="margin-top:20px;" (click)="saveSettings()" [disabled]="isSavingSettings">
+              {{ isSavingSettings ? '⏳ Saving...' : '💾 Save Schedule' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TAB 3: RESTORE HISTORY -->
+      <div id="tab-history" class="tab-content" [class.active]="activeTab === 'tab-history'" [style.display]="activeTab === 'tab-history' ? 'block' : 'none'">
+        <div class="agy-table-container">
+          <div class="agy-table-title">
+            Restore History & Available Backups
+          </div>
+          <table class="agy-table">
+            <thead>
+              <tr>
+                <th>Backup Name</th>
+                <th>Type</th>
+                <th>Data</th>
+                <th>Created By</th>
+                <th>Created At</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="backups.length === 0">
+                <td colspan="7" style="text-align:center; padding:32px; color:#64748B;">No backup history available. Run a backup first.</td>
+              </tr>
+              <tr *ngFor="let b of backups">
+                <td style="font-weight:600;">{{ b.backupName }}</td>
+                <td><span class="status" [ngClass]="getTypeClass(b.backupType)">{{ b.backupType }}</span></td>
+                <td style="color:#64748B;">{{ b.includeData }}</td>
+                <td>{{ b.createdBy }}</td>
+                <td>{{ b.createdAt | date:'medium' }}</td>
+                <td><span class="status" [ngClass]="getStatusClass(b.status)">{{ b.status }}</span></td>
+                <td>
+                  <a href="javascript:void(0)" class="action-link restore-btn" (click)="restoreBackup(b)" *ngIf="b.status === 'Success'">🔄 Restore</a>
+                  <span *ngIf="b.status !== 'Success'" style="color:#94A3B8; font-size:0.8rem;">N/A</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- TAB 4: RETENTION POLICIES -->
+      <div id="tab-policies" class="tab-content" [class.active]="activeTab === 'tab-policies'" [style.display]="activeTab === 'tab-policies' ? 'block' : 'none'">
+        <div class="cat-card">
+          <div class="cat-header" style="margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom:16px;">
+            <h3 style="margin:0; font-size: 1.1rem; color: var(--text);">Retention Settings</h3>
+          </div>
+          <div class="form-group" style="max-width: 400px; margin-bottom: 24px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Backup Retention Period (Days)</label>
+            <input type="number" class="cr-input" [(ngModel)]="settings.retentionDays" min="1" max="365">
+            <p style="font-size:0.78rem; color:var(--muted); margin-top:6px;">Backups older than this many days will be automatically removed by the scheduler.</p>
+          </div>
+          <button class="btn-primary action-btn" (click)="saveRetentionPolicy()" [disabled]="isSavingSettings">
+            {{ isSavingSettings ? '⏳ Saving...' : '💾 Save Policies' }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- TAB 5: BACKUP SETTINGS -->
+      <div id="tab-settings" class="tab-content" [class.active]="activeTab === 'tab-settings'" [style.display]="activeTab === 'tab-settings' ? 'block' : 'none'">
+        <div class="cat-card">
+          <div class="cat-header" style="margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom:16px;">
+            <h3 style="margin:0; font-size: 1.1rem; color: var(--text);">General Backup Settings</h3>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; max-width:700px;">
+            <div class="form-group" style="grid-column: span 2;">
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Backup Storage Path</label>
+              <input type="text" class="cr-input" [(ngModel)]="settings.storagePath" placeholder="e.g. C:\ApexWorldBackups">
+              <p style="font-size:0.78rem; color:var(--muted); margin-top:6px;">Server-side directory where backup files (.bak, .trn, .zip) will be saved.</p>
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Default Backup Type</label>
+              <select class="cr-select" [(ngModel)]="settings.backupType">
+                <option value="Full">Full Backup</option>
+                <option value="Differential">Differential Backup</option>
+                <option value="Log">Log (Incremental)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Frequency</label>
+              <select class="cr-select" [(ngModel)]="settings.frequency">
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Scheduled Time (UTC)</label>
+              <input type="time" class="cr-input" [(ngModel)]="settings.backupTime">
+            </div>
+            <div class="form-group">
+              <label style="display:block; font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Scheduler Enabled</label>
+              <select class="cr-select" [(ngModel)]="settings.isEnabled">
+                <option [ngValue]="true">Yes — Active</option>
+                <option [ngValue]="false">No — Paused</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary action-btn" style="margin-top:24px;" (click)="saveSettings()" [disabled]="isSavingSettings">
+            {{ isSavingSettings ? '⏳ Saving...' : '💾 Save Settings' }}
+          </button>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Right Sidebar Area -->
+    <div class="bk-side-col">
+      
+      <!-- Backup Analytics Summary -->
+      <div class="cat-card side-card" style="text-align:center;">
+        <h3 style="margin:0 0 20px 0; font-size:1.05rem; text-align:left;">Backup Analytics</h3>
+        <div class="donut-chart-container" style="position:relative; width:140px; height:140px; margin:0 auto 20px;">
+          <div class="donut-circle" style="width:100%; height:100%; border-radius:50%; border:14px solid #F1F5F9; border-top-color:#2563EB; border-right-color:#2563EB; transform:rotate(-45deg); display:flex; align-items:center; justify-content:center; flex-direction:column;">
+            <div style="transform:rotate(45deg); display:flex; flex-direction:column; align-items:center;">
+              <span class="big-num" style="font-size:1.8rem; font-weight:800; color:var(--text); line-height:1;">{{ totalCount }}</span>
+              <span class="lbl" style="font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">Total</span>
+            </div>
+          </div>
+        </div>
+        <ul class="summary-list" style="list-style:none; padding:0; margin:0; text-align:left;">
+          <li style="display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+            <span style="display:flex; align-items:center; gap:8px;"><span style="width:10px; height:10px; border-radius:50%; background:#10B981; display:inline-block;"></span> Successful</span> 
+            <strong style="color:var(--text);">{{ successCount }}</strong>
+          </li>
+          <li style="display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+            <span style="display:flex; align-items:center; gap:8px;"><span style="width:10px; height:10px; border-radius:50%; background:#EF4444; display:inline-block;"></span> Failed</span> 
+            <strong style="color:var(--text);">{{ failedCount }}</strong>
+          </li>
+          <li style="display:flex; justify-content:space-between;">
+            <span style="display:flex; align-items:center; gap:8px;"><span style="width:10px; height:10px; border-radius:50%; background:#64748B; display:inline-block;"></span> Backup Size</span> 
+            <strong style="color:var(--text);">{{ totalSizeStr }}</strong>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Storage Usage -->
+      <div class="cat-card side-card">
+        <h3 style="margin:0 0 16px 0; font-size:1.05rem;">Storage Usage</h3>
+        <div class="progress-bar-container" style="height:12px; background:#F1F5F9; border-radius:6px; overflow:hidden; margin-bottom:12px; border:1px solid #E2E8F0;">
+          <div class="progress-bar" [style.width.%]="storagePercent" style="height:100%; background:linear-gradient(90deg, #3B82F6, #2563EB); border-radius:6px; transition:width 0.5s ease;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <p class="storage-text" style="margin:0; font-size:0.85rem; font-weight:700; color:var(--text);">{{ statusKpi.usedStorageGB | number:'1.2-2' }} GB used</p>
+          <p style="margin:0; font-size:0.75rem; font-weight:600; color:var(--muted);">{{ storagePercent }}%</p>
+        </div>
+        <p class="storage-text" style="margin:0 0 16px 0; font-size:0.8rem; color:var(--muted);">Available: {{ (statusKpi.totalStorageGB - statusKpi.usedStorageGB) | number:'1.1-2' }} GB of {{ statusKpi.totalStorageGB }} GB</p>
+        <p style="margin:0 0 16px 0; font-size:0.8rem; color:var(--muted);" *ngIf="statusKpi.nextScheduledBackup">
+          Next scheduled: {{ statusKpi.nextScheduledBackup | date:'medium' }}
+        </p>
+        <button class="btn-block-outline action-btn" style="width:100%; padding:10px; font-weight:600; background:#fff; border:1px solid var(--border); border-radius:6px; cursor:pointer; color:var(--text);" (click)="setTab('tab-settings')">⚙️ Configure Storage</button>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="cat-card side-card clickable" (click)="setTab('tab-history')" style="display:flex; align-items:center; gap:16px; padding: 16px;">
+        <span style="font-size:1.4rem; color:#3B82F6;">&#8635;</span> 
+        <strong style="font-size: 0.95rem; color: var(--text);">Restore Data</strong>
+      </div>
+      
+      <div class="cat-card side-card clickable" (click)="setTab('tab-schedules')" style="display:flex; align-items:center; gap:16px; padding: 16px;">
+        <span style="font-size:1.4rem; color:#8B5CF6;">&#128197;</span> 
+        <strong style="font-size: 0.95rem; color: var(--text);">View Schedules</strong>
+      </div>
+      
+      <div class="cat-card side-card clickable" (click)="openBackupModal()" style="display:flex; align-items:center; gap:16px; padding: 16px;">
+        <span style="font-size:1.4rem; color:#10B981;">&#9889;</span> 
+        <strong style="font-size: 0.95rem; color: var(--text);">Backup Now</strong>
+      </div>
+      
+      <div class="cat-card side-card clickable" (click)="setTab('tab-settings')" style="display:flex; align-items:center; gap:16px; padding: 16px;">
+        <span style="font-size:1.4rem; color:#64748B;">&#9881;&#65039;</span> 
+        <strong style="font-size: 0.95rem; color: var(--text);">Backup Settings</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Generic Modal -->
+<div class="generic-modal-overlay" [class.active]="showModal">
+  <div class="generic-modal-content">
+    <h3 style="margin-top:0; color:var(--text, #0F172A); font-size:1.2rem; font-weight:700;">{{ modalTitle }}</h3>
+    <p style="color:var(--muted, #475569); font-size:0.9rem; line-height:1.5; margin-bottom:24px;" [innerHTML]="modalDesc"></p>
+    <div style="display:flex; justify-content:flex-end; gap:12px;">
+      <button class="btn-outline" (click)="closeModal()" style="padding:10px 16px; border:1px solid var(--border,#E2E8F0); background:transparent; border-radius:6px; cursor:pointer; font-weight:600; color:var(--text);">Cancel</button>
+      <button *ngIf="showModalConfirm" class="btn-primary" (click)="onConfirmModal()" style="padding:10px 16px; border:none; background:#2563EB; color:#fff; border-radius:6px; cursor:pointer; font-weight:600;">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Backup Now Modal ───────────────────────────────── -->
+<div class="bk-modal-overlay" [class.show]="showBackupModal">
+  <div class="bk-modal-card">
+    <div class="bk-modal-hdr">
+      <h3>⚡ Initiate New Backup</h3>
+      <button class="bk-modal-close" (click)="closeBackupModal()">&times;</button>
+    </div>
+    <div class="bk-modal-body">
+      <div class="bk-form-row">
+        <div class="bk-form-group">
+          <label>Backup Name <span class="req">*</span></label>
+          <input type="text" class="bk-input" placeholder="e.g. REPMS_Full_Backup_Aug2026"
+                 [(ngModel)]="newBackup.backupName">
+        </div>
+        <div class="bk-form-group">
+          <label>Backup Type <span class="req">*</span></label>
+          <select class="bk-input" [(ngModel)]="newBackup.backupType">
+            <option value="Full">Full</option>
+            <option value="Differential">Differential</option>
+            <option value="Log">Log (Incremental)</option>
+          </select>
+        </div>
+      </div>
+      <div class="bk-form-group">
+        <label>Include Data <span class="req">*</span></label>
+        <select class="bk-input" [(ngModel)]="newBackup.includeData">
+          <option value="DatabaseOnly">Database Only (.bak / .trn)</option>
+          <option value="FilesOnly">Files Only (uploads ZIP archive)</option>
+          <option value="AllData">All Data (Database + Files)</option>
+        </select>
+        <small style="color:#64748B; font-size:0.78rem; display:block; margin-top:4px;">
+          <span *ngIf="newBackup.includeData === 'DatabaseOnly'">Backs up the ApexWorldREPMS SQL Server database only.</span>
+          <span *ngIf="newBackup.includeData === 'FilesOnly'">Packages all application uploads (images, receipts) into a ZIP archive.</span>
+          <span *ngIf="newBackup.includeData === 'AllData'">Creates both a database backup and a files ZIP, packaged together.</span>
+        </small>
+      </div>
+      <div class="bk-form-group">
+        <label>Description</label>
+        <input type="text" class="bk-input" placeholder="e.g. Pre-deployment safety backup"
+               [(ngModel)]="newBackup.backupDescription">
+      </div>
+      <div style="margin-top:12px; padding:12px; background:#FEF3C7; border:1px solid #FCD34D; border-radius:8px; font-size:0.82rem; color:#92400E;" *ngIf="newBackup.backupType !== 'Full' && newBackup.includeData !== 'FilesOnly'">
+        ⚠️ <strong>{{ newBackup.backupType }}</strong> backup requires an existing successful <strong>Full</strong> backup in the chain.
+      </div>
+    </div>
+    <div class="bk-modal-footer">
+      <button class="bk-btn-cancel" (click)="closeBackupModal()">Cancel</button>
+      <button class="bk-btn-primary" (click)="initiateBackup()" [disabled]="isSaving">
+        {{ isSaving ? '⏳ Running Backup...' : '⚡ Start Backup' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── View Backup Details Modal ─────────────────────── -->
+<div class="bk-modal-overlay" [class.show]="showViewModal">
+  <div class="bk-modal-card">
+    <div class="bk-modal-hdr">
+      <h3>🔍 Backup Details</h3>
+      <button class="bk-modal-close" (click)="closeViewModal()">&times;</button>
+    </div>
+    <div class="bk-modal-body" *ngIf="selectedBackup">
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">Backup Name</span><span class="detail-val">{{ selectedBackup.backupName }}</span></div>
+        <div class="detail-item"><span class="detail-label">Type</span><span class="status" [ngClass]="getTypeClass(selectedBackup.backupType)">{{ selectedBackup.backupType }}</span></div>
+        <div class="detail-item"><span class="detail-label">Data Included</span><span class="detail-val">{{ selectedBackup.includeData }}</span></div>
+        <div class="detail-item"><span class="detail-label">File Size</span><span class="detail-val">{{ formatFileSize(selectedBackup.fileSize) }}</span></div>
+        <div class="detail-item"><span class="detail-label">Status</span>
+          <span class="status" [ngClass]="getStatusClass(selectedBackup.status)">{{ selectedBackup.status }}</span>
+        </div>
+        <div class="detail-item"><span class="detail-label">Created By</span><span class="detail-val">{{ selectedBackup.createdBy }}</span></div>
+        <div class="detail-item"><span class="detail-label">Created At</span><span class="detail-val">{{ selectedBackup.createdAt | date:'medium' }}</span></div>
+        <div class="detail-item"><span class="detail-label">Retain Until</span><span class="detail-val">{{ selectedBackup.retentionUntil | date:'mediumDate' }}</span></div>
+        <div class="detail-item" style="grid-column: span 2;" *ngIf="selectedBackup.checksum"><span class="detail-label">SHA-256 Checksum</span><span class="detail-val" style="font-family:monospace; font-size:0.75rem; word-break:break-all;">{{ selectedBackup.checksum }}</span></div>
+        <div class="detail-item" style="grid-column: span 2;" *ngIf="selectedBackup.errorMessage"><span class="detail-label">Error</span><span class="detail-val" style="color:#EF4444;">{{ selectedBackup.errorMessage }}</span></div>
+        <div class="detail-item"><span class="detail-label">Backup ID</span><span class="detail-val">#{{ selectedBackup.id }}</span></div>
+        <div class="detail-item" *ngIf="selectedBackup.parentBackupId"><span class="detail-label">Parent Backup ID</span><span class="detail-val">#{{ selectedBackup.parentBackupId }}</span></div>
+      </div>
+    </div>
+    <div class="bk-modal-footer">
+      <button class="bk-btn-cancel" (click)="closeViewModal()">Close</button>
+      <button class="bk-btn-secondary" (click)="downloadBackup(selectedBackup!.id); closeViewModal()" *ngIf="selectedBackup?.status === 'Success'">⬇ Download</button>
+      <button class="bk-btn-warning" (click)="restoreBackup(selectedBackup!); closeViewModal()" *ngIf="selectedBackup?.status === 'Success'">🔄 Restore</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Restore Preview Modal ──────────────────────────── -->
+<div class="bk-modal-overlay" [class.show]="showRestorePreviewModal">
+  <div class="bk-modal-card" style="max-width:600px;">
+    <div class="bk-modal-hdr">
+      <h3>🔄 Restore Preview</h3>
+      <button class="bk-modal-close" (click)="closeRestorePreviewModal()">&times;</button>
+    </div>
+    <div class="bk-modal-body">
+      <div *ngIf="isLoadingPreview" style="text-align:center; padding:32px; color:#64748B;">
+        ⏳ Validating backup chain...
+      </div>
+      <div *ngIf="!isLoadingPreview && restorePreview">
+        <!-- Validation Status -->
+        <div style="padding:12px 16px; border-radius:8px; margin-bottom:16px;"
+             [style.background]="restorePreview.isValid ? '#F0FDF4' : '#FEF2F2'"
+             [style.border]="restorePreview.isValid ? '1px solid #BBF7D0' : '1px solid #FECACA'">
+          <strong [style.color]="restorePreview.isValid ? '#166534' : '#991B1B'">
+            {{ restorePreview.isValid ? '✅ Valid — Ready to restore' : '❌ Invalid — ' + restorePreview.validationMessage }}
+          </strong>
+          <p style="margin:4px 0 0; font-size:0.82rem;" [style.color]="restorePreview.isValid ? '#15803D' : '#B91C1C'">
+            Estimated restore time: ~{{ restorePreview.estimatedRestoreTimeSeconds }}s
+          </p>
+        </div>
+
+        <!-- Backup Chain -->
+        <p style="font-size:0.85rem; font-weight:600; color:var(--text); margin-bottom:8px;">Required Backup Chain (will be applied in order):</p>
+        <div *ngFor="let item of restorePreview.requiredBackupChain; let i = index" 
+             style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; margin-bottom:8px;"
+             [style.background]="item.fileExists ? '#fff' : '#FEF2F2'">
+          <span style="width:24px; height:24px; border-radius:50%; background:#2563EB; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; flex-shrink:0;">{{ i+1 }}</span>
+          <div style="flex:1;">
+            <strong style="font-size:0.85rem;">{{ item.backupName }}</strong>
+            <div style="font-size:0.75rem; color:#64748B;">{{ item.backupType }} · {{ item.includeData }} · {{ item.createdAt | date:'medium' }}</div>
+          </div>
+          <span [style.color]="item.fileExists ? '#10B981' : '#EF4444'" style="font-size:0.8rem; font-weight:600;">
+            {{ item.fileExists ? '✅ Found' : '❌ Missing' }}
+          </span>
+        </div>
+
+        <!-- Warning -->
+        <div style="margin-top:16px; padding:12px; background:#FEF3C7; border:1px solid #FCD34D; border-radius:8px; font-size:0.82rem; color:#92400E;">
+          ⚠️ <strong>Warning:</strong> Restoration will close all active database connections, apply the backup chain, and bring the database back online. A <strong>pre-restore safety backup</strong> will be created automatically before proceeding.
+        </div>
+      </div>
+    </div>
+    <div class="bk-modal-footer">
+      <button class="bk-btn-cancel" (click)="closeRestorePreviewModal()">Cancel</button>
+      <button class="bk-btn-danger" (click)="confirmRestore()" 
+              [disabled]="!restorePreview?.isValid || isRestoring || isLoadingPreview">
+        {{ isRestoring ? '⏳ Restoring...' : '🔄 Confirm Restore' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Confirm Modal ──────────────────────────── -->
+<div class="bk-modal-overlay" [class.show]="showDeleteModal">
+  <div class="bk-modal-card bk-modal-sm">
+    <div class="bk-modal-hdr bk-danger-hdr">
+      <span>⚠️</span>
+      <h3>Delete Backup Record</h3>
+    </div>
+    <div class="bk-modal-body">
+      <p style="color:#475569; line-height:1.6; margin:0;">Are you sure you want to permanently delete this backup record and its associated file? This action cannot be undone.</p>
+      <p style="color:#EF4444; font-size:0.82rem; margin-top:8px;">Note: Full backups that are required by Differential or Log backups in their chain cannot be deleted.</p>
+    </div>
+    <div class="bk-modal-footer">
+      <button class="bk-btn-cancel" (click)="closeDeleteModal()">Cancel</button>
+      <button class="bk-btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+        {{ isDeleting ? '⏳ Deleting...' : 'Yes, Delete' }}
+      </button>
+    </div>
+  </div>
+</div>

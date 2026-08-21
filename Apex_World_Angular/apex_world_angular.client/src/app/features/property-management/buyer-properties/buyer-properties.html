@@ -1,0 +1,87 @@
+<!-- --- MAIN SEARCH & DIRECTORY --- -->
+<section class="bk-hero">
+  <div class="bk-wide bk-hero-inner">
+    <div class="bk-hero-text">
+      <div class="bk-hero-badge">🏢 PROPERTY EXPLORER</div>
+      <h1 class="bk-hero-title">Properties <span class="bk-hero-accent">Directory</span></h1>
+      <p class="bk-hero-sub">Browse through our 100% verified listings, filter your options, and find the perfect property that fits your needs.</p>
+      <div class="bk-hero-stats">
+        <div class="bk-stat-pill">
+          <span class="bk-stat-num">{{ totalProperties }}</span>
+          <span class="bk-stat-label">Listings</span>
+        </div>
+        <div class="bk-stat-pill">
+          <span class="bk-stat-num" style="color:#10B981;">{{ verifiedProperties }}</span>
+          <span class="bk-stat-label">Verified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-container bk-wide" style="margin-top: -30px; position: relative; z-index: 10;">
+  
+  <!-- Modern Search Bar Section -->
+  <div class="search-experience-wrapper" style="margin-bottom: 24px; background: #fff; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 18px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+    <div style="position: relative; flex: 1; min-width: 280px; display: flex; align-items: center;">
+      <span style="position: absolute; left: 16px; font-size: 1.2rem; color: var(--text-muted);">🔍</span>
+      <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search by property name, location, category..." style="width: 100%; padding: 14px 16px 14px 48px; font-size: 0.95rem; border-radius: 8px; border: 1.5px solid var(--border); background-color: #F8FAFC; color: var(--primary); font-weight: 600; outline: none; transition: var(--transition);">
+    </div>
+    
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+      <button class="btn btn-outline" (click)="toggleAdvancedFilters()" style="height: 48px; border-radius: 8px; font-weight: 700; border: 1.5px solid var(--secondary); color: var(--secondary-dark); background: transparent; padding: 0 24px; cursor: pointer;">Filters</button>
+      <button class="btn btn-outline" (click)="clearFilters()" style="height: 48px; border-radius: 8px; font-weight: 700; border: 1.5px solid var(--border); color: var(--text-muted); background: transparent; padding: 0 24px; cursor: pointer;">Clear</button>
+    </div>
+  </div>
+
+  <!-- Properties Grid -->
+  <div class="grid-properties mt-4">
+    <ng-container *ngIf="filteredProperties.length > 0; else noProperties">
+      <div class="property-card" *ngFor="let prop of filteredProperties">
+        <div class="property-image-wrapper">
+          <img [src]="getPrimaryImage(prop)" [alt]="prop.title" onerror="this.src='/assets/images/placeholder.jpg'">
+          <div class="property-tag">{{ prop.status || 'Available' }}</div>
+          <div class="property-wishlist-btn" (click)="toggleWishlist(prop.id, $event)" style="cursor: pointer; user-select: none;">
+            {{ wishlistedIds.has(prop.id) ? '❤️' : '🤍' }}
+          </div>
+        </div>
+        <div class="property-content">
+          <div class="property-specs">{{ prop.bedrooms || 0 }} beds • {{ prop.bathrooms || 0 }} baths • {{ prop.areaSize || prop.carpetArea || 0 }} sqft</div>
+          <h3 class="property-title">{{ prop.title }}</h3>
+          <div class="property-location">📍 {{ prop.address || 'Location Not Specified' }}</div>
+          <div class="property-footer">
+            <div class="property-price">₹ {{ prop.price | number }}</div>
+            <button class="property-btn" (click)="viewDetails(prop.id)">View Details</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    
+    <ng-template #noProperties>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 40px; color: var(--primary); background: #FFF; border-radius: 16px; border: 1px dashed var(--border); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
+        <span style="font-size: 3rem;">🏚️</span>
+        <h3 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--primary);">No properties found</h3>
+        <p style="color: var(--text-muted); max-width: 320px; margin: 0 0 8px; font-size: 0.95rem; line-height: 1.5;">Try changing your search keywords or adjusting your filters.</p>
+        <button class="btn btn-outline" (click)="clearFilters()" style="border: 1.5px solid var(--secondary); color: var(--secondary-dark); background: transparent; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer;">Clear Search</button>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Pagination -->
+  <app-pagination 
+    [currentPage]="currentPage" 
+    [totalItems]="totalItems" 
+    [pageSize]="pageSize" 
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>
+
+<!-- ADVANCED FILTERS MODAL (Simplified for layout) -->
+<div *ngIf="showAdvancedFilters" class="cancel-modal-overlay" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 27, 53, 0.6); backdrop-filter: blur(8px); z-index:3000; align-items:center; justify-content:center;">
+  <div class="cancel-modal" style="background:#fff; border-radius:20px; width:90%; max-width:600px; padding:24px; position:relative;">
+    <button (click)="closeFilters()" style="position:absolute; top:20px; right:20px; background:transparent; border:none; font-size:1.6rem; cursor:pointer;">&times;</button>
+    <h2 style="font-size:1.5rem; font-weight:800; color:var(--primary);">Advanced Property Filters</h2>
+    <p style="color:var(--text-muted); margin-bottom: 20px;">Filters functionality is handled server-side.</p>
+    <button class="btn btn-primary w-100" (click)="closeFilters()" style="padding: 12px; border-radius: 8px;">Close</button>
+  </div>
+</div>

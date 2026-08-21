@@ -1,0 +1,367 @@
+<div class="la-page">
+
+  <!-- PROPERTY SUMMARY HEADER -->
+  <div class="la-prop-header">
+    <div class="la-prop-img-wrap">
+      <img [src]="propImg" alt="Property" class="la-prop-img" />
+    </div>
+    <div class="la-prop-meta">
+      <div class="la-prop-tag">🏦 Home Loan Application</div>
+      <h2 class="la-prop-name">{{ propName }}</h2>
+      <p class="la-prop-sub">{{ propSub }}</p>
+      <p class="la-prop-loc">{{ propLoc }}</p>
+      <div class="la-prop-specs">
+        <span>📐 {{ propSize }}</span>
+        <span>🛏️ {{ propBeds }}</span>
+        <span>🛀 {{ propBaths }}</span>
+      </div>
+    </div>
+    <div class="la-price-summary">
+      <div class="la-price-row"><span>Property Value</span><span>₹ {{ baseAmount | number }}</span></div>
+      <div class="la-price-row"><span>GST (12%)</span><span>₹ {{ gst | number }}</span></div>
+      <div class="la-price-row"><span>Registration (3%)</span><span>₹ {{ reg | number }}</span></div>
+      <div class="la-price-row la-total-row"><span>Total</span><span>₹ {{ total | number }}</span></div>
+      <div class="la-price-row la-advance-row"><span>Token Advance Paid</span><span>₹ {{ payable | number }}</span></div>
+      <div class="la-price-row la-loan-row"><span>Loan Required</span><span>₹ {{ remaining | number }}</span></div>
+    </div>
+  </div>
+
+  <!-- STEP PROGRESS BAR -->
+  <div class="la-steps-bar" *ngIf="currentStep < 6">
+    <div class="la-step" [class.active]="currentStep >= 1" [class.done]="currentStep > 1">
+      <div class="la-step-dot">{{ currentStep > 1 ? '✓' : '1' }}</div>
+      <span>Personal</span>
+    </div>
+    <div class="la-step-line" [class.done]="currentStep > 1"></div>
+    <div class="la-step" [class.active]="currentStep >= 2" [class.done]="currentStep > 2">
+      <div class="la-step-dot">{{ currentStep > 2 ? '✓' : '2' }}</div>
+      <span>Identity</span>
+    </div>
+    <div class="la-step-line" [class.done]="currentStep > 2"></div>
+    <div class="la-step" [class.active]="currentStep >= 3" [class.done]="currentStep > 3">
+      <div class="la-step-dot">{{ currentStep > 3 ? '✓' : '3' }}</div>
+      <span>Employment</span>
+    </div>
+    <div class="la-step-line" [class.done]="currentStep > 3"></div>
+    <div class="la-step" [class.active]="currentStep >= 4" [class.done]="currentStep > 4">
+      <div class="la-step-dot">{{ currentStep > 4 ? '✓' : '4' }}</div>
+      <span>Loan Details</span>
+    </div>
+    <div class="la-step-line" [class.done]="currentStep > 4"></div>
+    <div class="la-step" [class.active]="currentStep >= 5" [class.done]="currentStep > 5">
+      <div class="la-step-dot">{{ currentStep > 5 ? '✓' : '5' }}</div>
+      <span>Bank & Submit</span>
+    </div>
+  </div>
+
+  <form class="la-form-wrap" #loanForm="ngForm">
+
+    <!-- STEP 1 -->
+    <div class="la-step-card" *ngIf="currentStep === 1">
+      <h2 class="la-step-title">Step 1 — Personal Information</h2>
+      <p class="la-step-desc">Provide your personal details exactly as per your government-issued ID.</p>
+      <div class="la-field-grid">
+        <div class="la-field">
+          <label>Full Name <span class="required-star">*</span></label>
+          <input type="text" name="fullName" [(ngModel)]="fullName" (focus)="clearError('fullName')" placeholder="Enter your full name" required #fullNameCtrl="ngModel" [class.is-invalid-custom]="fullNameCtrl.invalid && (fullNameCtrl.dirty || fullNameCtrl.touched)" />
+          <div *ngIf="fullNameCtrl.invalid && (fullNameCtrl.dirty || fullNameCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['fullName']">{{ errors['fullName'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Mobile Number <span class="required-star">*</span></label>
+          <input type="tel" name="mobile" [(ngModel)]="mobile" (focus)="clearError('mobile')" placeholder="10-digit mobile" maxlength="10" required #mobileCtrl="ngModel" [class.is-invalid-custom]="mobileCtrl.invalid && (mobileCtrl.dirty || mobileCtrl.touched)" />
+          <div *ngIf="mobileCtrl.invalid && (mobileCtrl.dirty || mobileCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['mobile']">{{ errors['mobile'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Email Address <span class="required-star">*</span></label>
+          <input type="email" name="email" [(ngModel)]="email" (focus)="clearError('email')" placeholder="you@example.com" required #emailCtrl="ngModel" [class.is-invalid-custom]="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" />
+          <div *ngIf="emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['email']">{{ errors['email'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Date of Birth <span class="required-star">*</span></label>
+          <input type="date" name="dob" [(ngModel)]="dob" (focus)="clearError('dob')" required #dobCtrl="ngModel" [class.is-invalid-custom]="dobCtrl.invalid && (dobCtrl.dirty || dobCtrl.touched)" />
+          <div *ngIf="dobCtrl.invalid && (dobCtrl.dirty || dobCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['dob']">{{ errors['dob'] }}</div>
+        </div>
+      </div>
+      <div class="la-consent-box">
+        <label class="la-check-label">
+          <input type="checkbox" [(ngModel)]="consent" />
+          <span>I authorize APEX WORLD and its lending partners to access my credit profile for loan eligibility assessment.</span>
+        </label>
+      </div>
+      <div class="la-actions">
+        <a [routerLink]="bookingId ? ['/buyer-dashboard/payment-management'] : ['/buyer-dashboard/bookings']" [queryParams]="bookingId ? { id: bookingId } : {}" class="la-btn-sec">← Back to Payment</a>
+        <button class="la-btn-pri" (click)="goToStep2()">Next: Identity Details →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="la-step-card" *ngIf="currentStep === 2">
+      <h2 class="la-step-title">Step 2 — Identity & Address</h2>
+      <p class="la-step-desc">Provide your KYC and residential address details.</p>
+      <div class="la-field-grid">
+        <div class="la-field">
+          <label>PAN Number <span class="required-star">*</span></label>
+          <input type="text" name="pan" [(ngModel)]="pan" (focus)="clearError('pan')" placeholder="ABCDE1234F" maxlength="10" required #panCtrl="ngModel" [class.is-invalid-custom]="panCtrl.invalid && (panCtrl.dirty || panCtrl.touched)" />
+          <div *ngIf="panCtrl.invalid && (panCtrl.dirty || panCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['pan']">{{ errors['pan'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Aadhaar Number <span class="required-star">*</span></label>
+          <input type="text" name="aadhaar" [(ngModel)]="aadhaar" (focus)="clearError('aadhaar')" placeholder="12-digit Aadhaar" maxlength="12" required #aadhaarCtrl="ngModel" [class.is-invalid-custom]="aadhaarCtrl.invalid && (aadhaarCtrl.dirty || aadhaarCtrl.touched)" />
+          <div *ngIf="aadhaarCtrl.invalid && (aadhaarCtrl.dirty || aadhaarCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['aadhaar']">{{ errors['aadhaar'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Gender <span class="required-star">*</span></label>
+          <select name="gender" [(ngModel)]="gender" (focus)="clearError('gender')" required #genderCtrl="ngModel" [class.is-invalid-custom]="genderCtrl.invalid && (genderCtrl.dirty || genderCtrl.touched)">
+            <option value="">Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+          <div *ngIf="genderCtrl.invalid && (genderCtrl.dirty || genderCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['gender']">{{ errors['gender'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Marital Status</label>
+          <select name="maritalStatus" [(ngModel)]="maritalStatus">
+            <option value="">Select</option>
+            <option>Single</option>
+            <option>Married</option>
+            <option>Divorced</option>
+            <option>Widowed</option>
+          </select>
+        </div>
+        <div class="la-field la-field-full">
+          <label>Residential Address <span class="required-star">*</span></label>
+          <textarea name="residentialAddress" [(ngModel)]="residentialAddress" (focus)="clearError('residentialAddress')" placeholder="Full residential address" rows="3" required #residentialAddressCtrl="ngModel" [class.is-invalid-custom]="residentialAddressCtrl.invalid && (residentialAddressCtrl.dirty || residentialAddressCtrl.touched)"></textarea>
+          <div *ngIf="residentialAddressCtrl.invalid && (residentialAddressCtrl.dirty || residentialAddressCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['residentialAddress']">{{ errors['residentialAddress'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Resident Type</label>
+          <select [(ngModel)]="residentType">
+            <option>Resident Indian</option>
+            <option>Non-Resident Indian (NRI)</option>
+            <option>Person of Indian Origin (PIO)</option>
+          </select>
+        </div>
+        <div class="la-field">
+          <label>Years at Current Address</label>
+          <select [(ngModel)]="yearsAtAddress">
+            <option>Less than 1 Year</option>
+            <option>1-3 Years</option>
+            <option>3-5 Years</option>
+            <option>More than 5 Years</option>
+          </select>
+        </div>
+      </div>
+      <div class="la-actions">
+        <button class="la-btn-sec" (click)="currentStep = 1">← Back</button>
+        <button class="la-btn-pri" (click)="goToStep3()">Next: Employment →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="la-step-card" *ngIf="currentStep === 3">
+      <h2 class="la-step-title">Step 3 — Employment & Income</h2>
+      <p class="la-step-desc">We use this to assess your repayment capacity.</p>
+      <div class="la-field-grid">
+        <div class="la-field">
+          <label>Employment Type <span class="required-star">*</span></label>
+          <select name="employmentType" [(ngModel)]="employmentType" (focus)="clearError('employmentType')" required #employmentTypeCtrl="ngModel" [class.is-invalid-custom]="employmentTypeCtrl.invalid && (employmentTypeCtrl.dirty || employmentTypeCtrl.touched)">
+            <option value="">Select type</option>
+            <option>Salaried</option>
+            <option>Self-Employed (Business)</option>
+            <option>Self-Employed (Professional)</option>
+            <option>Government / PSU</option>
+          </select>
+          <div *ngIf="employmentTypeCtrl.invalid && (employmentTypeCtrl.dirty || employmentTypeCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['employmentType']">{{ errors['employmentType'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Company / Employer Name <span class="required-star">*</span></label>
+          <input type="text" name="companyName" [(ngModel)]="companyName" (focus)="clearError('companyName')" placeholder="e.g. Infosys Ltd." required #companyNameCtrl="ngModel" [class.is-invalid-custom]="companyNameCtrl.invalid && (companyNameCtrl.dirty || companyNameCtrl.touched)" />
+          <div *ngIf="companyNameCtrl.invalid && (companyNameCtrl.dirty || companyNameCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['companyName']">{{ errors['companyName'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Designation <span class="required-star">*</span></label>
+          <input type="text" name="designation" [(ngModel)]="designation" (focus)="clearError('designation')" placeholder="e.g. Software Engineer" required #designationCtrl="ngModel" [class.is-invalid-custom]="designationCtrl.invalid && (designationCtrl.dirty || designationCtrl.touched)" />
+          <div *ngIf="designationCtrl.invalid && (designationCtrl.dirty || designationCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['designation']">{{ errors['designation'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Work Experience <span class="required-star">*</span></label>
+          <select name="workExperience" [(ngModel)]="workExperience" (focus)="clearError('workExperience')" required #workExperienceCtrl="ngModel" [class.is-invalid-custom]="workExperienceCtrl.invalid && (workExperienceCtrl.dirty || workExperienceCtrl.touched)">
+            <option value="">Select experience</option>
+            <option>Less than 1 Year</option>
+            <option>1-3 Years</option>
+            <option>3-5 Years</option>
+            <option>5-10 Years</option>
+            <option>More than 10 Years</option>
+          </select>
+          <div *ngIf="workExperienceCtrl.invalid && (workExperienceCtrl.dirty || workExperienceCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['workExperience']">{{ errors['workExperience'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Gross Monthly Income (Rs.) <span class="required-star">*</span></label>
+          <input type="number" name="monthlyIncome" [(ngModel)]="monthlyIncome" (focus)="clearError('monthlyIncome')" min="0" placeholder="e.g. 120000" required #monthlyIncomeCtrl="ngModel" [class.is-invalid-custom]="monthlyIncomeCtrl.invalid && (monthlyIncomeCtrl.dirty || monthlyIncomeCtrl.touched)" />
+          <div *ngIf="monthlyIncomeCtrl.invalid && (monthlyIncomeCtrl.dirty || monthlyIncomeCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['monthlyIncome']">{{ errors['monthlyIncome'] }}</div>
+        </div>
+        <div class="la-field">
+          <label>Other Monthly Income (Rs.)</label>
+          <input type="number" name="otherIncome" [(ngModel)]="otherIncome" min="0" placeholder="Rental / freelance etc." />
+        </div>
+        <div class="la-field">
+          <label>Existing EMI Obligations (Rs./month)</label>
+          <input type="number" name="existingEmi" [(ngModel)]="existingEmi" min="0" placeholder="Total ongoing EMIs" />
+        </div>
+        <div class="la-field">
+          <label>CIBIL Score Range <span class="required-star">*</span></label>
+          <select name="cibilScore" [(ngModel)]="cibilScore" (focus)="clearError('cibilScore')" required #cibilScoreCtrl="ngModel" [class.is-invalid-custom]="cibilScoreCtrl.invalid && (cibilScoreCtrl.dirty || cibilScoreCtrl.touched)">
+            <option value="">Select range</option>
+            <option>750 - 900 (Excellent)</option>
+            <option>700 - 749 (Good)</option>
+            <option>650 - 699 (Average)</option>
+            <option>Below 650 (Poor)</option>
+            <option>No Credit History</option>
+          </select>
+          <div *ngIf="cibilScoreCtrl.invalid && (cibilScoreCtrl.dirty || cibilScoreCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+          <div class="la-err" *ngIf="errors['cibilScore']">{{ errors['cibilScore'] }}</div>
+        </div>
+      </div>
+      <div class="la-actions">
+        <button class="la-btn-sec" (click)="currentStep = 2">← Back</button>
+        <button class="la-btn-pri" (click)="goToStep4()">Next: Loan Details →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="la-step-card" *ngIf="currentStep === 4">
+      <h2 class="la-step-title">Step 4 — Loan Details & EMI Preview</h2>
+      <p class="la-step-desc">Adjust the loan amount, tenure, and interest rate to see your estimated EMI.</p>
+      <div class="la-emi-wrap">
+        <div class="la-emi-inputs">
+          <div class="la-field">
+            <div class="la-label-row">
+              <label>Loan Amount</label>
+              <span class="la-val-badge">Rs. {{ loanAmount | number:'1.0-0' }}</span>
+            </div>
+            <input type="range" class="la-slider" [(ngModel)]="loanAmount" min="100000" max="20000000" step="50000" (input)="calcEMI()" />
+            <div class="la-range-labels"><span>Rs.1 L</span><span>Rs.2 Cr</span></div>
+          </div>
+          <div class="la-field">
+            <div class="la-label-row">
+              <label>Tenure</label>
+              <span class="la-val-badge">{{ tenureYears }} Years</span>
+            </div>
+            <input type="range" class="la-slider" [(ngModel)]="tenureYears" min="1" max="30" step="1" (input)="calcEMI()" />
+            <div class="la-range-labels"><span>1 Yr</span><span>30 Yrs</span></div>
+          </div>
+          <div class="la-field">
+            <div class="la-label-row">
+              <label>Interest Rate (p.a.)</label>
+              <span class="la-val-badge">{{ interestRate }}%</span>
+            </div>
+            <input type="range" class="la-slider" [(ngModel)]="interestRate" min="6" max="18" step="0.1" (input)="calcEMI()" />
+            <div class="la-range-labels"><span>6%</span><span>18%</span></div>
+          </div>
+        </div>
+        <div class="la-emi-result">
+          <div class="la-emi-badge">
+            <div class="la-emi-label">Estimated Monthly EMI</div>
+            <div class="la-emi-amount">Rs. {{ emiResult | number:'1.0-0' }}</div>
+          </div>
+          <div class="la-emi-breakdown">
+            <div class="la-emi-row"><span>Principal</span><span>Rs. {{ loanAmount | number:'1.0-0' }}</span></div>
+            <div class="la-emi-row"><span>Total Interest</span><span>Rs. {{ (emiResult * tenureYears * 12 - loanAmount) | number:'1.0-0' }}</span></div>
+            <div class="la-emi-row la-emi-total"><span>Total Payable</span><span>Rs. {{ (emiResult * tenureYears * 12) | number:'1.0-0' }}</span></div>
+          </div>
+          <p class="la-emi-note">* Indicative values. Final rates are set by the lending partner.</p>
+        </div>
+      </div>
+      <div class="la-actions">
+        <button class="la-btn-sec" (click)="currentStep = 3">← Back</button>
+        <button class="la-btn-pri" (click)="currentStep = 5">Next: Bank and Submit →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="la-step-card" *ngIf="currentStep === 5">
+      <h2 class="la-step-title">Step 5 — Bank Account & Declaration</h2>
+      <p class="la-step-desc">Provide your bank details for loan disbursement.</p>
+      <div class="la-field-grid">
+        <div class="la-field">
+          <label>Preferred Bank</label>
+          <select [(ngModel)]="bankName">
+            <option>State Bank of India</option>
+            <option>HDFC Bank</option>
+            <option>ICICI Bank</option>
+            <option>Axis Bank</option>
+            <option>Kotak Mahindra Bank</option>
+            <option>Punjab National Bank</option>
+            <option>Bank of Baroda</option>
+            <option>Canara Bank</option>
+            <option>Union Bank of India</option>
+            <option>IndusInd Bank</option>
+            <option>YES Bank</option>
+            <option>IDFC FIRST Bank</option>
+          </select>
+        </div>
+        <div class="la-field">
+          <label>Loan Purpose</label>
+          <select [(ngModel)]="loanPurpose">
+            <option>Purchase of New Property</option>
+            <option>Home Construction</option>
+            <option>Home Renovation</option>
+            <option>Plot Purchase</option>
+          </select>
+        </div>
+        <div class="la-field">
+          <label>Account Number <span class="required-star">*</span></label>
+          <input type="text" name="accountNumber" [(ngModel)]="accountNumber" placeholder="Enter account number" required #accountNumberCtrl="ngModel" [class.is-invalid-custom]="accountNumberCtrl.invalid && (accountNumberCtrl.dirty || accountNumberCtrl.touched)" />
+          <div *ngIf="accountNumberCtrl.invalid && (accountNumberCtrl.dirty || accountNumberCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+        </div>
+        <div class="la-field">
+          <label>IFSC Code <span class="required-star">*</span></label>
+          <input type="text" name="ifscCode" [(ngModel)]="ifscCode" placeholder="e.g. SBIN0001234" maxlength="11" required #ifscCodeCtrl="ngModel" [class.is-invalid-custom]="ifscCodeCtrl.invalid && (ifscCodeCtrl.dirty || ifscCodeCtrl.touched)" />
+          <div *ngIf="ifscCodeCtrl.invalid && (ifscCodeCtrl.dirty || ifscCodeCtrl.touched)" class="invalid-feedback-custom">Field is required</div>
+        </div>
+      </div>
+      <div class="la-declaration-box">
+        <h4>Declaration</h4>
+        <p>I hereby declare that all the information provided by me in this application is true, correct, and complete to the best of my knowledge. I understand that providing false information may lead to rejection or legal action.</p>
+        <label class="la-check-label">
+          <input type="checkbox" name="declarationAccepted" [(ngModel)]="declarationAccepted" required #declarationAcceptedCtrl="ngModel" />
+          <span>I accept the above declaration and agree to the Terms and Conditions.</span>
+        </label>
+      </div>
+      <div class="la-actions">
+        <button class="la-btn-sec" (click)="currentStep = 4">← Back</button>
+        <button class="la-btn-submit" (click)="submitLoanApplication()" [disabled]="isApplying || loanForm.invalid">
+          <span *ngIf="!isApplying">Submit Loan Application</span>
+          <span *ngIf="isApplying">Submitting...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 6: SUCCESS -->
+    <div class="la-success-card" *ngIf="currentStep === 6">
+      <div class="la-success-icon">success</div>
+      <h2>Loan Application Submitted!</h2>
+      <p>Your home loan application has been received and is under review by our lending partners. You will receive updates within 2 to 3 business days.</p>
+      <div class="la-ref-badge">Reference: {{ successReferenceId }}</div>
+      <div class="la-success-actions">
+        <a routerLink="/buyer-dashboard/bookings" class="la-btn-pri">View Loan Status</a>
+        <a routerLink="/buyer-dashboard/bookings" class="la-btn-sec">Go to My Bookings</a>
+      </div>
+    </div>
+
+  </form>
+</div>

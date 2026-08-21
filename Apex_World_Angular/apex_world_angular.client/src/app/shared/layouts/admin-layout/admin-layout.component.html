@@ -1,0 +1,40 @@
+<div class="admin-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <img src="/assets/images/logo.png" alt="Apex World Logo" class="sidebar-logo" onerror="this.style.display='none'">
+        <div class="sidebar-title">
+          <span class="brand">APEX WORLD</span>
+          <span class="sub-brand">Executive Admin Console</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a routerLink="/admin-dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item"><span class="icon">&#128202;</span> Dashboard</a>
+        <a routerLink="/admin-dashboard/customer-management" class="nav-item" routerLinkActive="active"><span class="icon">&#128100;</span> Customer Management</a>
+        <a routerLink="/admin-dashboard/admin-property-management" routerLinkActive="active" class="nav-item"><span class="icon">&#127970;</span> Property Management</a>
+        <a routerLink="/admin-dashboard/site-visit-management" routerLinkActive="active" class="nav-item"><span class="icon">&#128101;</span> Site-Visit Management</a>
+        <a routerLink="/admin-dashboard/booking-management" routerLinkActive="active" class="nav-item"><span class="icon">&#128197;</span> Booking Management</a>
+        <a routerLink="/admin-dashboard/payment-management" routerLinkActive="active" class="nav-item"><span class="icon">&#128179;</span> Payment Management</a>
+        <a routerLink="/admin-dashboard/loan-management" routerLinkActive="active" class="nav-item"><span class="icon">&#127974;</span> Loan Management</a>
+        <a routerLink="/admin-dashboard/review-management" routerLinkActive="active" class="nav-item"><span class="icon">&#11088;</span> Review &amp; Enquiry Mgt</a>
+        <a routerLink="/admin-dashboard/report-management" routerLinkActive="active" class="nav-item"><span class="icon">&#128200;</span> Reports &amp; Analytics</a>
+        <a routerLink="/admin-dashboard/content-management" routerLinkActive="active" class="nav-item"><span class="icon">&#128221;</span> Content Management</a>
+        <a routerLink="/admin-dashboard/backup-management" routerLinkActive="active" class="nav-item"><span class="icon">&#128190;</span> Backup &amp; Recovery</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a routerLink="/admin-dashboard/help-center" routerLinkActive="active" class="nav-item" style="margin-bottom: 16px;"><span class="icon">&#9432;</span> Help Center</a>
+        <a href="javascript:void(0)" (click)="logout()" class="nav-item logout-btn"><span class="icon">&#128682;</span> Logout</a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+      
+      <!-- HEADER (Only shown for default dashboard) -->
+      <app-admin-header *ngIf="isDashboard()" breadcrumb="Dashboard" title=""></app-admin-header>
+      <router-outlet></router-outlet>
+    </main>
+  </div>

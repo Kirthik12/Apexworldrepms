@@ -1,0 +1,105 @@
+<!-- --- TOP BAR & HEADER NAV --- -->
+<div id="navbar-container">
+  <div class="top-bar" id="top-offers-banner" style="background: var(--primary); display: flex; align-items: center; justify-content: center; height: 34px; box-sizing: border-box; padding: 0 16px; font-size: 0.85rem; color: #fff;">
+    <div style="position: absolute; left: 16px; font-weight: 800; color: #ffd700; letter-spacing: 0.5px;">⚡ EXCLUSIVE DEALS</div>
+    
+    <div style="position: relative; width: 60%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+      <div class="top-offer-slide" style="position: absolute; width: 100%; text-align: center; opacity: 1; pointer-events: none;">
+        <span style="font-weight: 700; color: #fff;">Oceanview Plot (3000 Sq.Ft) - </span>
+        <span style="text-decoration: line-through; color: #ff8a8a; margin: 0 8px;">&#8377; 80 Lakhs</span>
+        <span style="font-weight: 700; color: #a5d6a7;">&#8377; 75 Lakhs</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a routerLink="/" class="logo">
+      <div class="logo-badge"><img src="assets/images/logo.png" alt="Apex World Brand Logo"></div>
+      APEX <span>WORLD</span>
+    </a>
+    <nav>
+      <a routerLink="/" class="active">Home</a>
+      <a routerLink="/" fragment="featured-properties">Property</a>
+      <a routerLink="/" fragment="services">Services</a>
+      <a routerLink="/" fragment="enquiry-desk">Enquiry Desk</a>
+      <a routerLink="/" fragment="" id="nav-contacts-link">Contacts</a>
+    </nav>
+    <div class="header-actions">
+      <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
+      <a routerLink="/register" class="btn btn-primary btn-sm">Register Here</a>
+    </div>
+  </div>
+</header>
+
+<!-- --- REGISTER MAIN PANEL --- -->
+<div class="auth-wrapper" style="padding: 40px 0;">
+  <div class="login-page-container">
+
+    <!-- Left Premium Panel -->
+    <div class="login-left-panel">
+      <div class="left-panel-content">
+        <span class="panel-badge">Join Apex World</span>
+        <h1 class="panel-heading">Unlock Your Real Estate Future</h1>
+        <p class="panel-text">Create an account to browse exclusive properties, schedule site visits, and manage your investments all in one place.</p>
+      </div>
+    </div>
+
+    <!-- Right Register Panel -->
+    <div class="login-right-panel">
+      <div class="auth-card">
+        <h2>Create an Account</h2>
+        <p class="subtitle">Join as a buyer to explore premium properties.</p>
+
+        <div *ngIf="errorMessage" style="color: red; background: #ffe6e6; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 0.9rem;">
+          {{ errorMessage }}
+        </div>
+
+        <form class="auth-form" (ngSubmit)="register()" #registerForm="ngForm">
+          
+          <div class="form-group mb-3">
+            <label for="username">Username <span class="required-star">*</span></label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Choose a unique username" [(ngModel)]="username" required #usernameModel="ngModel" [class.is-invalid-custom]="usernameModel.invalid && (usernameModel.dirty || usernameModel.touched)">
+            <div *ngIf="usernameModel.invalid && (usernameModel.dirty || usernameModel.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Enter your full name" [(ngModel)]="fullName">
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" [(ngModel)]="email">
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="password">Password <span class="required-star">*</span></label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" [(ngModel)]="password" required #passwordModel="ngModel" [class.is-invalid-custom]="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)">
+            <div *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)" class="invalid-feedback-custom">Field is required</div>
+            <small style="font-size: 0.75rem; color: #64748B;">Requires 8+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.</small>
+          </div>
+          
+          <div class="form-group mb-4">
+            <label for="confirm-password">Confirm Password <span class="required-star">*</span></label>
+            <input type="password" id="confirm-password" name="confirmPassword" class="form-control" placeholder="Confirm your password" [(ngModel)]="confirmPassword" required #confirmPasswordModel="ngModel" [class.is-invalid-custom]="confirmPasswordModel.invalid && (confirmPasswordModel.dirty || confirmPasswordModel.touched)">
+            <div *ngIf="confirmPasswordModel.invalid && (confirmPasswordModel.dirty || confirmPasswordModel.touched)" class="invalid-feedback-custom">Field is required</div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100 py-3" style="font-weight: 700;" [disabled]="registerForm.invalid">
+            {{ isSubmitting ? 'Creating Account...' : 'Register' }}
+          </button>
+        </form>
+        
+        <div class="text-center" style="margin-top: 24px;">
+          <p style="font-size: 0.95rem; color: #64748B;">
+            Already have an account? 
+            <a routerLink="/login" style="color: #1E3A8A; font-weight: 700; text-decoration: none; transition: 0.2s;" onmouseover="this.style.color='#C9962A'" onmouseout="this.style.color='#1E3A8A'">Log In</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

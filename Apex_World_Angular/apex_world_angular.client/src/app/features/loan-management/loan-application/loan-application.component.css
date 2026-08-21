@@ -1,0 +1,244 @@
+﻿/* ── Page Layout ───────────────────────────────────────── */
+.la-page {
+  min-height: 100vh;
+  background: #f8f9fc;
+  padding-bottom: 60px;
+}
+
+/* ── Property Header Banner ─────────────────────────────── */
+.la-prop-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  padding: 32px 40px;
+  flex-wrap: wrap;
+}
+.la-prop-img-wrap {
+  width: 180px;
+  height: 130px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.la-prop-img { width: 100%; height: 100%; object-fit: cover; }
+.la-prop-meta { flex: 1; min-width: 200px; }
+.la-prop-tag {
+  display: inline-block;
+  background: rgba(255,200,0,0.18);
+  color: #ffc800;
+  border: 1px solid rgba(255,200,0,0.3);
+  border-radius: 20px;
+  padding: 3px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+.la-prop-name { font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+.la-prop-sub { font-size: 14px; color: rgba(255,255,255,0.7); margin: 0 0 4px; }
+.la-prop-loc { font-size: 13px; color: rgba(255,255,255,0.6); margin: 0 0 10px; }
+.la-prop-specs { display: flex; gap: 14px; flex-wrap: wrap; }
+.la-prop-specs span { font-size: 12px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; }
+
+.la-price-summary { min-width: 260px; }
+.la-price-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; color: rgba(255,255,255,0.8); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.la-total-row { font-weight: 700; color: #fff; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.3); margin-top: 6px; padding-top: 8px; border-bottom: none; }
+.la-advance-row span:last-child { color: #4ade80; font-weight: 600; }
+.la-loan-row span:last-child { color: #fbbf24; font-weight: 700; font-size: 15px; }
+
+/* ── Step Progress Bar ─────────────────────────────────── */
+.la-steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 40px 8px;
+  gap: 0;
+  flex-wrap: wrap;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+.la-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.la-step-dot {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #9ca3af;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  transition: all 0.3s;
+}
+.la-step.active .la-step-dot { background: #0f3460; color: #fff; }
+.la-step.done .la-step-dot { background: #10b981; color: #fff; }
+.la-step span { font-size: 11px; color: #9ca3af; font-weight: 500; }
+.la-step.active span { color: #0f3460; font-weight: 700; }
+.la-step.done span { color: #10b981; }
+.la-step-line { width: 48px; height: 2px; background: #e5e7eb; margin: 0 4px 20px; transition: background 0.3s; }
+.la-step-line.done { background: #10b981; }
+
+/* ── Form Wrapper ──────────────────────────────────────── */
+.la-form-wrap { max-width: 860px; margin: 32px auto; padding: 0 20px; }
+
+/* ── Step Card ─────────────────────────────────────────── */
+.la-step-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 40px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  border: 1px solid #f0f0f0;
+}
+.la-step-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin: 0 0 6px; }
+.la-step-desc { font-size: 13px; color: #6b7280; margin: 0 0 28px; }
+
+/* ── Form Fields ──────────────────────────────────────── */
+.la-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+  margin-bottom: 24px;
+}
+.la-field-full { grid-column: 1 / -1; }
+.la-field { display: flex; flex-direction: column; gap: 6px; }
+.la-field label { font-size: 13px; font-weight: 600; color: #374151; }
+.la-field input, .la-field select, .la-field textarea {
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #1a1a2e;
+  background: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.la-field input:focus, .la-field select:focus, .la-field textarea:focus {
+  border-color: #0f3460;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(15,52,96,0.08);
+}
+.la-field textarea { resize: vertical; }
+.la-err { font-size: 12px; color: #ef4444; font-weight: 500; }
+.req { color: #ef4444; }
+
+/* ── Consent / Declaration ───────────────────────────── */
+.la-consent-box, .la-declaration-box {
+  background: #f0f7ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+.la-declaration-box h4 { margin: 0 0 8px; font-size: 14px; color: #1a1a2e; }
+.la-declaration-box p { font-size: 13px; color: #374151; margin: 0 0 12px; line-height: 1.6; }
+.la-check-label { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #374151; cursor: pointer; }
+.la-check-label input[type="checkbox"] { margin-top: 3px; width: 15px; height: 15px; accent-color: #0f3460; flex-shrink: 0; }
+
+/* ── EMI Step Layout ─────────────────────────────────── */
+.la-emi-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 28px; }
+.la-emi-inputs { display: flex; flex-direction: column; gap: 24px; }
+.la-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.la-label-row label { font-size: 13px; font-weight: 600; color: #374151; }
+.la-val-badge { background: #0f3460; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 13px; font-weight: 700; }
+.la-slider {
+  -webkit-appearance: none;
+  width: 100%; height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #0f3460 0%, #0f3460 50%, #e5e7eb 50%);
+  outline: none; cursor: pointer;
+}
+.la-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #0f3460;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+.la-range-labels { display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; margin-top: 4px; }
+.la-emi-result {
+  background: linear-gradient(135deg, #0f3460, #1a1a6e);
+  border-radius: 14px;
+  padding: 28px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.la-emi-badge { text-align: center; }
+.la-emi-label { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+.la-emi-amount { font-size: 32px; font-weight: 800; color: #fbbf24; }
+.la-emi-breakdown { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.la-emi-row { display: flex; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,0.8); }
+.la-emi-total { font-weight: 700; color: #fff; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; margin-top: 4px; }
+.la-emi-note { font-size: 11px; color: rgba(255,255,255,0.5); margin: 0; }
+
+/* ── Action Buttons ──────────────────────────────────── */
+.la-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 16px; }
+.la-btn-pri {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #0f3460, #1a1a6e);
+  color: #fff; border: none; border-radius: 10px;
+  padding: 13px 28px; font-size: 14px; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 14px rgba(15,52,96,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.la-btn-pri:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15,52,96,0.4); }
+.la-btn-sec {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; color: #0f3460;
+  border: 1.5px solid #0f3460; border-radius: 10px;
+  padding: 12px 24px; font-size: 14px; font-weight: 600;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.la-btn-sec:hover { background: #f0f7ff; }
+.la-btn-submit {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff; border: none; border-radius: 10px;
+  padding: 14px 32px; font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16,185,129,0.3);
+  transition: transform 0.2s, opacity 0.2s;
+}
+.la-btn-submit:hover:not(:disabled) { transform: translateY(-2px); }
+.la-btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Success Card ────────────────────────────────────── */
+.la-success-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+.la-success-icon { font-size: 64px; margin-bottom: 20px; }
+.la-success-card h2 { font-size: 26px; font-weight: 800; color: #1a1a2e; margin: 0 0 12px; }
+.la-success-card p { font-size: 14px; color: #6b7280; max-width: 480px; margin: 0 auto 28px; line-height: 1.7; }
+.la-ref-badge {
+  display: inline-block;
+  background: #f0fdf4; border: 1.5px solid #6ee7b7;
+  color: #059669; border-radius: 10px;
+  padding: 10px 24px; font-size: 14px; font-weight: 700;
+  margin-bottom: 32px;
+}
+.la-success-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .la-prop-header { padding: 20px; }
+  .la-prop-img-wrap { width: 100%; height: 200px; }
+  .la-field-grid { grid-template-columns: 1fr; }
+  .la-emi-wrap { grid-template-columns: 1fr; }
+  .la-step-card { padding: 24px 20px; }
+  .la-actions { flex-direction: column-reverse; align-items: stretch; }
+  .la-btn-pri, .la-btn-sec, .la-btn-submit { text-align: center; justify-content: center; }
+  .la-steps-bar { padding: 20px 16px 8px; gap: 4px; }
+  .la-step-line { width: 24px; }
+  .la-step span { display: none; }
+}

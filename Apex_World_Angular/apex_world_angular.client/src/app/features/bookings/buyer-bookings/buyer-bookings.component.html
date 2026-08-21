@@ -1,0 +1,331 @@
+﻿<!-- HERO BANNER -->
+  <section class="bk-hero">
+    <div class="bk-wide bk-hero-inner">
+      <div class="bk-hero-text">
+        <div class="bk-hero-badge">🏢 Reservation Desk</div>
+        <h1 class="bk-hero-title">My <span class="bk-hero-accent">Bookings</span></h1>
+        <p class="bk-hero-sub">Track, manage and review all your property reservations in one powerful dashboard.</p>
+        <div class="bk-hero-stats">
+          <div class="bk-stat-pill">
+            <span class="bk-stat-num" id="stat-total">4</span>
+            <span class="bk-stat-label">Total</span>
+          </div>
+          <div class="bk-stat-pill">
+            <span class="bk-stat-num" id="stat-pending" style="color:#EF4444;">1</span>
+            <span class="bk-stat-label">Pending</span>
+          </div>
+          <div class="bk-stat-pill">
+            <span class="bk-stat-num" id="stat-active" style="color:#F59E0B;">2</span>
+            <span class="bk-stat-label">Active</span>
+          </div>
+          <div class="bk-stat-pill">
+            <span class="bk-stat-num" id="stat-completed" style="color:#10B981;">1</span>
+            <span class="bk-stat-label">Completed</span>
+          </div>
+        </div>
+      </div>
+      <div class="bk-hero-actions">
+        <button id="new-booking-btn" class="bk-btn-primary">
+          <span>➕</span> New Booking
+        </button>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main class="bk-main bk-wide">
+
+    <!-- LEFT COLUMN -->
+    <div class="bk-left">
+
+      <!-- FILTER TABS + SEARCH BAR -->
+      <div class="bk-filter-bar">
+        <div class="bk-tabs" id="bookings-tabs">
+          <button class="bk-tab active" data-tab="all">All Bookings <span class="bk-count">4</span></button>
+          <button class="bk-tab" data-tab="pending">Payment Pending <span class="bk-count bk-count-danger">1</span></button>
+          <button class="bk-tab" data-tab="scheduled">Site Visit <span class="bk-count bk-count-warn">1</span></button>
+          <button class="bk-tab" data-tab="signed">Agreement <span class="bk-count bk-count-info">1</span></button>
+          <button class="bk-tab" data-tab="completed">Completed <span class="bk-count bk-count-success">1</span></button>
+        </div>
+        <div class="bk-search-wrap">
+          <span class="bk-search-icon">🔍</span>
+          <input type="text" id="bookings-search" placeholder="Search bookings..." class="bk-search-input">
+        </div>
+      </div>
+
+      <!-- BOOKING CARDS (Dynamically populated by bookings.js) -->
+      <div id="bookings-list-container" class="bk-cards-list"></div><!-- /bookings-list-container -->
+
+      <!-- EMPTY STATE -->
+      <div id="bk-empty-state" style="display:none;" class="bk-empty">
+        <div style="font-size:3rem;margin-bottom:16px;">📭</div>
+        <h3 style="font-size:1.3rem;font-weight:700;color:var(--primary);margin-bottom:8px;">No bookings found</h3>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Try a different filter or search term.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN (SIDEBAR) -->
+    <aside class="bk-sidebar">
+
+      <!-- Summary Card -->
+      <div class="bk-sidebar-card">
+        <h4 class="bk-sidebar-title">📊 Booking Summary</h4>
+        <div class="bk-summary-grid">
+          <div class="bk-summary-item bk-si-blue">
+            <div class="bk-si-num">4</div>
+            <div class="bk-si-label">Total</div>
+          </div>
+          <div class="bk-summary-item bk-si-red">
+            <div class="bk-si-num">1</div>
+            <div class="bk-si-label">Pending</div>
+          </div>
+          <div class="bk-summary-item bk-si-amber">
+            <div class="bk-si-num">2</div>
+            <div class="bk-si-label">Active</div>
+          </div>
+          <div class="bk-summary-item bk-si-green">
+            <div class="bk-si-num">1</div>
+            <div class="bk-si-label">Done</div>
+          </div>
+        </div>
+        <div class="bk-sidebar-divider"></div>
+        <div class="bk-total-value-row">
+          <span class="bk-tv-label">Total Portfolio Value</span>
+          <span class="bk-tv-amount" id="total-portfolio-value">&#8377; 0</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bk-sidebar-card">
+        <h4 class="bk-sidebar-title">&#9889; Quick Actions</h4>
+        <div class="bk-action-list">
+          <a href="../../property-management/user-properties/properties.html" class="bk-action-item">
+            <span class="bk-action-icon" style="background:var(--primary-light);color:var(--primary);">&#127968;</span>
+            <div>
+              <div class="bk-action-label">Browse Properties</div>
+              <div class="bk-action-sub">Explore new listings</div>
+            </div>
+          </a>
+          <div class="bk-action-item" id="payment-history-action" style="cursor:pointer;">
+            <span class="bk-action-icon" style="background:#FEF3C7;color:#D97706;">&#128179;</span>
+            <div>
+              <div class="bk-action-label">Payment History</div>
+              <div class="bk-action-sub">View all payments</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Visit Reminder -->
+      <div class="bk-sidebar-card bk-reminder-card" id="bk-reminder-card" style="display:none;"></div>
+    </aside>
+  </main>
+
+  <!-- ----------------------------------------------------------------
+       BOOKING DETAIL MODAL
+  ---------------------------------------------------------------- -->
+  <div class="property-details-overlay" id="bk-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+    <div class="property-details-modal" style="background: var(--bg-white); border-radius: 20px; padding: 40px; width: 90%; max-width: 800px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+      <span id="bk-modal-close-btn" style="position: absolute; top: 20px; right: 24px; cursor: pointer; font-size: 1.5rem; font-weight: 700; color: var(--text-muted);">✖</span>
+      
+      <div id="modal-image-box" style="width: 100%; height: 260px; border-radius: 16px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative;">
+        <img id="bk-modal-img" src="" alt="Property View" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div>
+          <h2 id="bk-modal-prop-name" style="font-size: 1.8rem; font-weight: 800; color: var(--text); margin: 0;"></h2>
+          <p id="bk-modal-loc" style="color: var(--text-muted); margin: 4px 0 0; font-size: 0.95rem;"></p>
+        </div>
+        <div id="bk-modal-price" style="font-size: 1.8rem; font-weight: 800; color: #D97706;"></div>
+      </div>
+
+      <div id="bk-modal-specs" style="background: var(--bg-light); padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; color: var(--text); margin-bottom: 20px; display: inline-block;"></div>
+
+      <h4 style="font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 10px;">About this Property</h4>
+      <p id="bk-modal-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;">This is a premium, verified property listing located in Chennai. It offers state of the art modern layout architecture designs, clean interior structures, and is strategically situated within walking distance to public transport links and key tech park hubs.</p>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!--  CANCELLATION POLICY MODAL                                       -->
+  <!-- ================================================================ -->
+  <div id="cancel-modal-overlay" class="cancel-modal-overlay" role="dialog" aria-modal="true" style="display:none; z-index: 2500;">
+    <div class="cancel-modal">
+      <button class="cancel-modal-close" id="cancel-modal-close">✖</button>
+
+      <div class="cancel-modal-header">
+        <div class="cancel-modal-icon">⚠️</div>
+        <h2>Cancel Booking</h2>
+        <p id="cancel-modal-subtitle">You are about to cancel your booking for <strong id="cancel-prop-name"></strong>.</p>
+      </div>
+
+      <!-- Policy Section -->
+      <div class="cancel-policy-box">
+        <h3>📋 Apex World Cancellation Policy</h3>
+        <div class="cancel-policy-grid">
+          <div class="cancel-policy-item free">
+            <div class="cancel-policy-icon">✅</div>
+            <div>
+              <div class="cancel-policy-stage">Pre-Payment Stage</div>
+              <div class="cancel-policy-desc">No payment has been made yet — <strong>No cancellation fee.</strong></div>
+            </div>
+          </div>
+          <div class="cancel-policy-item charge">
+            <div class="cancel-policy-icon">⚠️</div>
+            <div>
+              <div class="cancel-policy-stage">After Payment (1-7 Days)</div>
+              <div class="cancel-policy-desc">A cancellation fee of <strong>10%</strong> (₹1,000) applies if cancelled within 1-7 days. The remaining ₹9,000 will be refunded.</div>
+            </div>
+          </div>
+          <div class="cancel-policy-item charge" style="border-left-color: #F59E0B;">
+            <div class="cancel-policy-icon">⚠️</div>
+            <div>
+              <div class="cancel-policy-stage">After Payment (8-30 Days)</div>
+              <div class="cancel-policy-desc">A cancellation fee of <strong>100%</strong> (₹10,000) applies if cancelled within 8-30 days. No refund will be issued.</div>
+            </div>
+          </div>
+          <div class="cancel-policy-item no-cancel">
+            <div class="cancel-policy-icon">🔒</div>
+            <div>
+              <div class="cancel-policy-stage">After Payment (>30 Days)</div>
+              <div class="cancel-policy-desc">Cancellation is <strong>not permitted</strong> after 30 days.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Refund Calculation -->
+      <div class="cancel-refund-box" id="cancel-refund-box" style="display:none;">
+        <h3>💰 Refund Calculation</h3>
+        <div class="cancel-refund-row">
+          <span>Amount Paid</span>
+          <span id="refund-paid-amount" class="refund-val">—</span>
+        </div>
+        <div class="cancel-refund-row">
+          <span>Cancellation Fee</span>
+          <span id="refund-fee-amount" class="refund-val refund-deduct">—</span>
+        </div>
+        <div class="cancel-refund-row refund-total-row">
+          <span>Refund to Bank Account</span>
+          <span id="refund-net-amount" class="refund-val refund-net">—</span>
+        </div>
+        <div class="cancel-refund-note">🏦 Refund will be credited to your registered bank account within <strong>5–7 working days</strong>.</div>
+      </div>
+
+      <!-- Free Cancellation Note -->
+      <div class="cancel-free-box" id="cancel-free-box" style="display:none;">
+        <div class="cancel-free-icon">✅</div>
+        <div>
+          <div class="cancel-free-title">Free Cancellation</div>
+          <div class="cancel-free-desc">No payment has been made for this booking. Your cancellation will be processed immediately with <strong>no charges</strong>.</div>
+        </div>
+      </div>
+
+      <!-- Confirmation -->
+      <div class="cancel-confirm-section">
+        <label class="cancel-confirm-label">
+          <input type="checkbox" id="cancel-confirm-check">
+          I have read and understood the cancellation policy above and wish to proceed with cancellation.
+        </label>
+        <button class="cancel-submit-btn" id="cancel-submit-btn" disabled>Confirm Cancellation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!--  CANCELLATION SUCCESS MODAL                                       -->
+  <!-- ================================================================ -->
+  <div id="cancel-success-modal-overlay" class="cancel-modal-overlay" role="dialog" aria-modal="true" style="display:none; z-index: 3000;">
+    <div class="cancel-modal" style="text-align: center; max-width: 460px;">
+      <div class="cancel-modal-header" style="margin-bottom: 20px;">
+        <div style="width: 80px; height: 80px; background: #D1FAE5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem;">✅</div>
+        <h2 style="color: #059669; font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;">Booking Cancelled</h2>
+        <p id="cancel-success-prop-name" style="color: var(--text-muted); font-size: 0.95rem; margin: 0;">Your booking has been cancelled successfully.</p>
+      </div>
+      <div id="cancel-success-refund-box" style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; text-align: left;">
+        <p style="margin: 0 0 6px; font-size: 0.9rem; color: #166534;"><strong>✅ Cancellation Applied</strong></p>
+        <p style="margin: 0; font-size: 0.85rem; color: #166534;">The property is now available again. You can browse other properties.</p>
+      </div>
+      <button id="cancel-success-close-btn" class="bk-btn-primary" style="width: 100%; justify-content: center; padding: 14px;">Done</button>
+    </div>
+  </div>
+
+  <!-- PAYMENT HISTORY MODAL -->
+  <div id="payment-history-modal-overlay" class="cancel-modal-overlay" role="dialog" aria-modal="true" style="display:none; z-index: 2500;">
+    <div class="cancel-modal" style="text-align: left; max-width: 650px;">
+      <div class="cancel-modal-header" style="text-align: center; margin-bottom: 20px;">
+        <div class="cancel-modal-icon" style="font-size: 3rem;">💳</div>
+        <h2>Payment History</h2>
+        <p>Review all your property transactions</p>
+      </div>
+      
+      <div class="agy-table-container">
+        <div class="agy-table-title">Payment History</div>
+        <table class="agy-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Booking ID</th>
+              <th>Status</th>
+              <th style="text-align: right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="ph-modal-tbody">
+            <!-- Dynamic Rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 16px; justify-content: center;">
+        <button id="ph-close-btn" class="bk-btn-outline" style="padding: 12px 24px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post Site Visit Decision Modal -->
+  <div id="post-visit-modal-overlay" class="cancel-modal-overlay" role="dialog" aria-modal="true" style="display:none; z-index: 2500;">
+    <div class="cancel-modal" style="text-align: center; max-width: 500px;">
+      <button class="cancel-modal-close" id="post-visit-close">×</button>
+      
+      <div class="cancel-modal-header" style="margin-bottom: 20px;">
+        <div class="cancel-modal-icon" style="font-size: 3rem;">🤝</div>
+        <h2>Site Visit Completed!</h2>
+        <p style="margin-top:10px;">Are you interested in purchasing this property?</p>
+      </div>
+
+      <div class="cancel-modal-actions" style="display: flex; gap: 16px; justify-content: center; margin-top: 30px;">
+        <button id="btn-interested" class="bk-btn-primary" style="padding: 12px 24px; flex: 1;">Interested (Pay Now)</button>
+        <button id="btn-not-interested" class="bk-btn-outline" style="padding: 12px 24px; flex: 1; border-color: #EF4444; color: #EF4444;">Not Interested</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANCELLATION POLICY MODAL -->
+  <div id="footer-cancel-modal" class="cancel-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; align-items:center; justify-content:center;">
+    <div class="cancel-modal" style="background:#fff; border-radius:12px; width:90%; max-width:500px; padding:24px; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+      <button onclick="document.getElementById('footer-cancel-modal').style.display='none';" style="position:absolute; top:16px; right:16px; background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:#64748b;">&times;</button>
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="width:60px; height:60px; background:#FEE2E2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <span style="font-size:2rem;">📄</span>
+        </div>
+        <h2 style="font-size:1.5rem; font-weight:700; color:#1e293b; margin:0 0 8px;">Cancellation Policy</h2>
+        <p style="color:#64748b; font-size:0.95rem; margin:0;">Please review our cancellation rules and regulations before proceeding.</p>
+      </div>
+      <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; color:#334155; line-height:1.6; border:1px solid #e2e8f0; max-height:200px; overflow-y:auto;">
+        <strong>1. Token Advance:</strong> Token advances are partially refundable if canceled within 48 hours of reservation.<br><br>
+        <strong>2. Processing Fees:</strong> A standard 2% processing fee will be deducted from all refunds.<br><br>
+        <strong>3. Timeline:</strong> Approved refunds may take 7-10 business days to reflect in your source account.<br><br>
+        <strong>4. Exceptions:</strong> Legal disputes or non-compliance with terms may result in forfeiture of the booking amount.
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:24px;">
+        <input type="checkbox" id="footer-cancel-confirm" style="margin-top:4px; width:18px; height:18px; cursor:pointer;">
+        <label for="footer-cancel-confirm" style="font-size:0.9rem; color:#475569; cursor:pointer; user-select:none;">I have read and agree to the terms outlined in the Cancellation Policy.</label>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button onclick="document.getElementById('footer-cancel-modal').style.display='none';" style="flex:1; padding:12px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s;">Dismiss</button>
+        <button onclick="if(document.getElementById('footer-cancel-confirm').checked) { alert('Policy accepted.'); document.getElementById('footer-cancel-modal').style.display='none'; } else { alert('Please agree to the policy first.'); }" style="flex:1; padding:12px; background:var(--primary, #2563EB); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s;">I Agree</button>
+      </div>
+    </div>
+  </div>

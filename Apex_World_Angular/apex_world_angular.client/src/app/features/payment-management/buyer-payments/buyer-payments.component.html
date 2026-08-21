@@ -1,0 +1,231 @@
+<div class="pm-page pm-wide">
+    <a routerLink="/buyer-dashboard/bookings" class="pm-breadcrumb">← Back to My Bookings</a>
+
+    <!-- ═══ STEP WIZARD BAR ═══ -->
+    <div class="pm-layout">
+
+      <!-- ────── LEFT: PROPERTY SIDEBAR ────── -->
+      <aside class="pm-left-sidebar">
+        <div class="pm-card pm-prop-card">
+          <div class="pm-prop-title-lbl">Property Details</div>
+          
+          <div class="pm-carousel-container">
+            <div class="pm-carousel-track" id="pm-carousel-track">
+              <div class="pm-carousel-slide"><img [src]="propImg" alt="Property Image" id="pm-main-img"></div>
+              <div class="pm-carousel-slide"><img src="/assets/images/buyer_slide1.png" alt="Interior Lounge"></div>
+              <div class="pm-carousel-slide"><img src="/assets/images/buyer_slide2.png" alt="Balcony View"></div>
+              <div class="pm-carousel-slide"><img src="/assets/images/buyer_slide3.png" alt="Master Bedroom"></div>
+            </div>
+            <div class="ss-carousel-dots pm-dots">
+              <button class="ss-cdot active" data-idx="0"></button>
+              <button class="ss-cdot" data-idx="1"></button>
+              <button class="ss-cdot" data-idx="2"></button>
+              <button class="ss-cdot" data-idx="3"></button>
+            </div>
+          </div>
+
+          <div class="pm-prop-meta">
+            <h3 class="pm-prop-name" id="pm-prop-name">{{ propName }}</h3>
+            <p class="pm-prop-sub" id="pm-prop-sub">{{ propSub }}</p>
+            <p class="pm-prop-loc" id="pm-prop-loc">{{ propLoc }}</p>
+            <div class="pm-prop-specs" id="pm-prop-specs">
+              <span id="pm-spec-size">{{ propSize }}</span>
+              <span id="pm-spec-beds">{{ propBeds }}</span>
+              <span id="pm-spec-baths">{{ propBaths }}</span>
+              <span id="pm-spec-balcony">🏢 1 Balcony</span>
+              <span id="pm-spec-parking">🚗 1 Car Parking</span>
+            </div>
+          </div>
+
+          <div class="pm-divider"></div>
+
+          <div class="pm-prop-title-lbl">Price Summary</div>
+          <div class="pm-price-rows">
+            <div class="pm-price-row"><span>Property Value</span><span id="pm-base-val">₹ {{ baseAmount | number }}</span></div>
+            <div class="pm-price-row"><span>GST (12%)</span><span id="pm-gst-val">₹ {{ gst | number }}</span></div>
+            <div class="pm-price-row"><span>Registration Fees (3%)</span><span id="pm-reg-val">₹ {{ reg | number }}</span></div>
+            <div class="pm-divider" style="margin: 8px 0;"></div>
+            <div class="pm-price-row pm-total-row"><span>Total Amount</span><span id="pm-total-val">₹ {{ total | number }}</span></div>
+            <div class="pm-price-row pm-payable-row"><span>Amount Payable (Token Advance)</span><span id="pm-payable-val">₹ {{ payable | number }}</span></div>
+          </div>
+
+          <div class="pm-meta-footer">
+            <div>Booking ID: <strong id="pm-booking-id">{{ bookingId }}</strong></div>
+            <div>Booking Date: <strong>20 May 2026</strong></div>
+          </div>
+          </div>
+      </aside>
+
+      <!-- ────── MIDDLE: PAYMENT METHODS ────── -->
+      <div class="pm-main-content">
+        <div class="pm-card pm-payment-card">
+          <h2 class="pm-section-h2">Complete Your Payment</h2>
+          <p class="pm-section-desc">Choose a payment method and complete your transaction securely.</p>
+
+          <div class="pm-methods-list">
+            <!-- Method 1: Apply Loan -->
+            <label class="pm-method-option" [class.active]="selectedMethod === 'loan'" (click)="selectedMethod = 'loan'">
+              <input type="radio" name="payment-method" value="loan" [(ngModel)]="selectedMethod">
+              <div class="pm-method-indicator"></div>
+              <span class="pm-method-icon">🏦</span>
+              <div class="pm-method-text">
+                <span class="pm-method-title">Apply Loan</span>
+                <span class="pm-method-sub">Get a home loan from our trusted partners</span>
+              </div>
+            </label>
+
+            <!-- Method 2: Net Banking -->
+            <label class="pm-method-option" [class.active]="selectedMethod === 'netbanking'" (click)="selectedMethod = 'netbanking'">
+              <input type="radio" name="payment-method" value="netbanking" [(ngModel)]="selectedMethod">
+              <div class="pm-method-indicator"></div>
+              <span class="pm-method-icon">🌐</span>
+              <div class="pm-method-text">
+                <span class="pm-method-title">Net Banking</span>
+                <span class="pm-method-sub">Pay using your bank account</span>
+              </div>
+            </label>
+
+            <!-- Method 3: Debit / Credit Card -->
+            <label class="pm-method-option" [class.active]="selectedMethod === 'card'" (click)="selectedMethod = 'card'">
+              <input type="radio" name="payment-method" value="card" [(ngModel)]="selectedMethod">
+              <div class="pm-method-indicator"></div>
+              <span class="pm-method-icon">💳</span>
+              <div class="pm-method-text">
+                <span class="pm-method-title">Debit / Credit Card</span>
+                <span class="pm-method-sub">Pay using Visa, Mastercard, RuPay</span>
+              </div>
+            </label>
+
+            <!-- Method 4: UPI Payment -->
+            <label class="pm-method-option" [class.active]="selectedMethod === 'upi'" (click)="selectedMethod = 'upi'">
+              <input type="radio" name="payment-method" value="upi" [(ngModel)]="selectedMethod">
+              <div class="pm-method-indicator"></div>
+              <span class="pm-method-icon">📱</span>
+              <div class="pm-method-text">
+                <span class="pm-method-title">UPI Payment</span>
+                <span class="pm-method-sub">Pay using GPay, PhonePe, Paytm, etc.</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Dynamic Payment Summary Box -->
+          <div class="pm-summary-box">
+            <h3 class="pm-summary-title">Payment Summary</h3>
+            <div class="pm-sum-rows">
+              <div class="pm-sum-row"><span>Property Value</span><strong id="sum-base">₹ {{ baseAmount | number }}</strong></div>
+              <div class="pm-sum-row"><span>GST (12%)</span><strong id="sum-gst">₹ {{ gst | number }}</strong></div>
+              <div class="pm-sum-row"><span>Registration Fees (3%)</span><strong id="sum-reg">₹ {{ reg | number }}</strong></div>
+              <div class="pm-sum-divider"></div>
+              <div class="pm-sum-row pm-grand"><span>Amount Payable (Token Advance)</span><strong id="sum-payable">₹ {{ payable | number }}</strong></div>
+            </div>
+
+            <div class="pm-redirect-notice" id="pm-redirect-notice">
+              {{ notices[selectedMethod] }}
+            </div>
+          </div>
+
+          <button class="pm-btn-primary" id="btn-action-proceed" [disabled]="isProcessing" (click)="proceedToPay()">
+            {{ isProcessing ? 'Processing Payment...' : btnTexts[selectedMethod] }}
+          </button>
+
+          <!-- Important Notes Box -->
+          <div class="pm-notes-box">
+            <div class="pm-notes-title">⚠️ Important Notes</div>
+            <ul>
+              <li>You will be redirected to our trusted banking partners to check eligibility and apply for a loan.</li>
+              <li>Loan approval is subject to bank's terms and conditions.</li>
+              <li>On successful loan approval, you can continue with the remaining process.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ────── RIGHT: TRUST & SECURE DETAILS ────── -->
+      <aside class="pm-right-sidebar">
+        <div class="pm-card pm-secure-badge-card">
+          <div class="pm-secure-header">
+            <span class="pm-lock-icon">🔒</span>
+            <div>
+              <strong>100% Secure Payment</strong>
+              <p>Your transaction is safe and protected</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pm-card pm-trust-details-card">
+          <div class="pm-trust-item">
+            <span class="pm-trust-icon">🛡️</span>
+            <div>
+              <strong>Secure Gateway</strong>
+              <p>Powered by Razorpay Trusted Business</p>
+            </div>
+          </div>
+          <div class="pm-trust-item">
+            <span class="pm-trust-icon">🔑</span>
+            <div>
+              <strong>256-bit SSL Encryption</strong>
+              <p>All data is fully encrypted</p>
+            </div>
+          </div>
+          <div class="pm-trust-item">
+            <span class="pm-trust-icon">💳</span>
+            <div>
+              <strong>PCI DSS Compliant</strong>
+              <p>We meet the highest security standards</p>
+            </div>
+          </div>
+          <div class="pm-trust-item">
+            <span class="pm-trust-icon">🔎</span>
+            <div>
+              <strong>Fraud Protection</strong>
+              <p>Your transaction is monitored 24/7</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pm-card pm-accept-card">
+          <div class="pm-sb-title" style="font-size: 0.75rem; margin-bottom: 8px;">We Accept</div>
+          <div class="pm-accept-logos">
+            <span>💳 Visa</span>
+            <span>💳 MasterCard</span>
+            <span>💳 RuPay</span>
+            <span>🌐 Net Banking</span>
+          </div>
+        </div>
+
+        <div class="pm-contact-widget">
+          <div style="font-weight: 700; color: var(--primary);">📞 +91 98765 43210</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">✉️ support@apexworld.com</div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- CANCELLATION POLICY MODAL -->
+  <div id="footer-cancel-modal" class="cancel-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; align-items:center; justify-content:center;">
+    <div class="cancel-modal" style="background:#fff; border-radius:12px; width:90%; max-width:500px; padding:24px; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+      <button onclick="document.getElementById('footer-cancel-modal').style.display='none';" style="position:absolute; top:16px; right:16px; background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:#64748b;">&times;</button>
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="width:60px; height:60px; background:#FEE2E2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <span style="font-size:2rem;">📄</span>
+        </div>
+        <h2 style="font-size:1.5rem; font-weight:700; color:#1e293b; margin:0 0 8px;">Cancellation Policy</h2>
+        <p style="color:#64748b; font-size:0.95rem; margin:0;">Please review our cancellation rules and regulations before proceeding.</p>
+      </div>
+      <div style="background:#f8fafc; padding:16px; border-radius:8px; margin-bottom:20px; font-size:0.9rem; color:#334155; line-height:1.6; border:1px solid #e2e8f0; max-height:200px; overflow-y:auto;">
+        <strong>1. Token Advance:</strong> Token advances are partially refundable if canceled within 48 hours of reservation.<br><br>
+        <strong>2. Processing Fees:</strong> A standard 2% processing fee will be deducted from all refunds.<br><br>
+        <strong>3. Timeline:</strong> Approved refunds may take 7-10 business days to reflect in your source account.<br><br>
+        <strong>4. Exceptions:</strong> Legal disputes or non-compliance with terms may result in forfeiture of the booking amount.
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:24px;">
+        <input type="checkbox" id="footer-cancel-confirm" style="margin-top:4px; width:18px; height:18px; cursor:pointer;">
+        <label for="footer-cancel-confirm" style="font-size:0.9rem; color:#475569; cursor:pointer; user-select:none;">I have read and agree to the terms outlined in the Cancellation Policy.</label>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button onclick="document.getElementById('footer-cancel-modal').style.display='none';" style="flex:1; padding:12px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s;">Dismiss</button>
+        <button onclick="if(document.getElementById('footer-cancel-confirm').checked) { alert('Policy accepted.'); document.getElementById('footer-cancel-modal').style.display='none'; } else { alert('Please agree to the policy first.'); }" style="flex:1; padding:12px; background:var(--primary, #2563EB); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s;">I Agree</button>
+      </div>
+    </div>
+  </div>

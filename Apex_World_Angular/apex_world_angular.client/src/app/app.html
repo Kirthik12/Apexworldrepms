@@ -1,0 +1,22 @@
+<router-outlet></router-outlet>
+<app-toast></app-toast>
+
+<!-- Global Floating AI Property Companion -->
+<ng-container *ngIf="isBuyerLoggedIn">
+  <button 
+    *ngIf="!isAiDrawerOpen"
+    (click)="toggleAiDrawer()" 
+    style="position: fixed; bottom: 25px; right: 25px; z-index: 99999; width: 60px; height: 60px; border-radius: 50%; background-color: #1e3a8a; color: white; display: flex; align-items: center; justify-content: center; font-size: 30px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s;"
+    onmouseover="this.style.transform='scale(1.1)'; this.style.backgroundColor='#1d4ed8';"
+    onmouseout="this.style.transform='scale(1)'; this.style.backgroundColor='#1e3a8a';"
+    title="Ask AI Companion"
+  >
+    🤖
+  </button>
+
+  <app-ai-companion-drawer 
+    [propertyId]="propertyContextId" 
+    [isOpen]="isAiDrawerOpen" 
+    (closeDrawer)="closeAiDrawer()">
+  </app-ai-companion-drawer>
+</ng-container>

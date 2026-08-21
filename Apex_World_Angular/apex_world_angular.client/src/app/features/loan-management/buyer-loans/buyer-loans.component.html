@@ -1,0 +1,176 @@
+<div class="ec-page">
+
+  <!-- HERO -->
+  <div class="ec-hero">
+    <div class="ec-hero-content">
+      <div class="ec-hero-tag">🏦 Smart Finance Tool</div>
+      <h1>EMI Calculator</h1>
+      <p>Plan your home loan repayments with precision. Adjust the loan amount, tenure, and interest rate to find the right EMI that fits your budget.</p>
+    </div>
+  </div>
+
+  <div class="ec-wrapper">
+
+    <!-- LEFT: Calculator Inputs -->
+    <div class="ec-card ec-calc-card">
+      <h2 class="ec-card-title">Calculate Your EMI</h2>
+
+      <!-- Loan Amount -->
+      <div class="ec-field">
+        <div class="ec-label-row">
+          <label>Loan Amount</label>
+          <span class="ec-value-badge">&#8377; {{ loanAmount | number:'1.0-0' }}</span>
+        </div>
+        <input type="range" class="ec-slider" [(ngModel)]="loanAmount"
+               min="100000" max="20000000" step="50000"
+               (input)="calculate()">
+        <div class="ec-range-labels"><span>&#8377;1 L</span><span>&#8377;2 Cr</span></div>
+      </div>
+
+      <!-- Tenure -->
+      <div class="ec-field">
+        <div class="ec-label-row">
+          <label>Loan Tenure</label>
+          <span class="ec-value-badge">{{ tenureYears }} Years</span>
+        </div>
+        <input type="range" class="ec-slider" [(ngModel)]="tenureYears"
+               min="1" max="30" step="1"
+               (input)="calculate()">
+        <div class="ec-range-labels"><span>1 Yr</span><span>30 Yrs</span></div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="ec-field">
+        <div class="ec-label-row">
+          <label>Interest Rate (% per annum)</label>
+          <span class="ec-value-badge">{{ interestRate | number:'1.1-2' }}%</span>
+        </div>
+        <input type="range" class="ec-slider" [(ngModel)]="interestRate"
+               min="6" max="20" step="0.05"
+               (input)="calculate()">
+        <div class="ec-range-labels"><span>6%</span><span>20%</span></div>
+      </div>
+
+      <!-- Manual Override Inputs -->
+      <div class="ec-manual-row">
+        <div class="ec-mini-field">
+          <label>Loan Amount (&#8377;)</label>
+          <input type="number" class="ec-inp" [(ngModel)]="loanAmount" (input)="calculate()" placeholder="e.g. 5000000">
+        </div>
+        <div class="ec-mini-field">
+          <label>Tenure (Years)</label>
+          <input type="number" class="ec-inp" [(ngModel)]="tenureYears" (input)="calculate()" min="1" max="30">
+        </div>
+        <div class="ec-mini-field">
+          <label>Rate (% p.a.)</label>
+          <input type="number" class="ec-inp" [(ngModel)]="interestRate" (input)="calculate()" step="0.05">
+        </div>
+      </div>
+
+      <button class="ec-btn-calc" (click)="calculate()">&#128260; Recalculate</button>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div class="ec-results-col">
+
+      <!-- EMI Result Card -->
+      <div class="ec-card ec-emi-result-card">
+        <div class="ec-emi-label">Monthly EMI</div>
+        <div class="ec-emi-value">&#8377; {{ emiResult | number:'1.0-0' }}</div>
+        <div class="ec-emi-sub">per month for {{ tenureYears }} {{ tenureYears === 1 ? 'year' : 'years' }}</div>
+
+        <!-- Donut Chart -->
+        <div class="ec-donut-wrap">
+          <div class="ec-donut-chart">
+            <svg viewBox="0 0 120 120" class="ec-donut-svg">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" stroke-width="16"/>
+              <circle cx="60" cy="60" r="50" fill="none"
+                      stroke="#4F46E5"
+                      stroke-width="16"
+                      [attr.stroke-dasharray]="principalArc + ' ' + totalArc"
+                      [attr.stroke-dashoffset]="donutOffset"
+                      stroke-linecap="round"
+                      transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="ec-donut-center">
+              <span class="ec-donut-pct">{{ principalPct | number:'1.0-0' }}%</span>
+              <span class="ec-donut-pct-label">Principal</span>
+            </div>
+          </div>
+          <div class="ec-donut-legend">
+            <div class="ec-legend-item"><span class="ec-dot ec-dot-principal"></span>Principal</div>
+            <div class="ec-legend-item"><span class="ec-dot ec-dot-interest"></span>Interest</div>
+          </div>
+        </div>
+
+        <div class="ec-breakdown">
+          <div class="ec-breakdown-row">
+            <span>Principal Amount</span>
+            <strong>&#8377; {{ loanAmount | number:'1.0-0' }}</strong>
+          </div>
+          <div class="ec-breakdown-row">
+            <span>Total Interest</span>
+            <strong class="ec-interest-val">&#8377; {{ totalInterest | number:'1.0-0' }}</strong>
+          </div>
+          <div class="ec-breakdown-row ec-grand-total">
+            <span>Total Amount Payable</span>
+            <strong>&#8377; {{ totalPayable | number:'1.0-0' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Apply Loan CTA -->
+      <div class="ec-card ec-apply-card">
+        <div class="ec-apply-icon">&#127968;</div>
+        <h3>Ready to Apply?</h3>
+        <p>Found the right EMI? Apply for a home loan through Apex World from your active bookings and get approval in simple steps.</p>
+        <a routerLink="/buyer-dashboard/bookings" class="ec-btn-apply">Go to My Bookings &#8594;</a>
+      </div>
+
+      <!-- Bank Rate Comparison -->
+      <div class="ec-card ec-banks-card">
+        <h3 class="ec-banks-title">&#128202; Current Home Loan Rates</h3>
+        <div class="ec-bank-row" *ngFor="let bank of bankRates">
+          <div class="ec-bank-name">{{ bank.name }}</div>
+          <div class="ec-bank-rate">{{ bank.rate }}% p.a.</div>
+          <div class="ec-bank-type">{{ bank.type }}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- AMORTIZATION TABLE -->
+  <div class="ec-card ec-amort-card">
+    <div class="ec-amort-header">
+      <h3>&#128203; Year-wise Amortization Schedule</h3>
+      <button class="ec-toggle-amort" (click)="showAmort = !showAmort">
+        {{ showAmort ? 'Hide Table &#9650;' : 'Show Table &#9660;' }}
+      </button>
+    </div>
+    <div class="agy-table-container" *ngIf="showAmort">
+      <div class="agy-table-title">Amortization Schedule</div>
+      <table class="agy-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Principal Paid</th>
+            <th>Interest Paid</th>
+            <th>Total Paid</th>
+            <th>Outstanding Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of amortSchedule">
+            <td>{{ row.year }}</td>
+            <td>&#8377; {{ row.principal | number:'1.0-0' }}</td>
+            <td>&#8377; {{ row.interest | number:'1.0-0' }}</td>
+            <td>&#8377; {{ row.total | number:'1.0-0' }}</td>
+            <td>&#8377; {{ row.balance | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

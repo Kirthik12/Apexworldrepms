@@ -1,0 +1,385 @@
+<app-admin-header 
+  breadcrumb="Admin Workspace / Review Management" 
+  title="Moderation Queue">
+</app-admin-header>
+
+<div class="rm-content-area modern-container">
+  
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card glass-card kpi-total">
+      <div class="kpi-details">
+        <p class="kpi-label">TOTAL SUBMISSIONS</p>
+        <h2 class="kpi-value">{{ totalSubmissions }}</h2>
+      </div>
+    </div>
+    
+    <div class="kpi-card glass-card kpi-pending">
+      <div class="kpi-details">
+        <p class="kpi-label">UNRESOLVED TICKETS</p>
+        <h2 class="kpi-value">{{ unresolvedTickets }} <span class="pending-suffix">Pending</span></h2>
+      </div>
+    </div>
+
+    <div class="kpi-card glass-card kpi-rating">
+      <div class="kpi-details">
+        <p class="kpi-label">AVERAGE PROPERTY RATING</p>
+        <h2 class="kpi-value">{{ averagePropertyRating | number:'1.1-1' }} <span class="rating-suffix">/ 5.0</span></h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="moderation-tabs">
+    <button class="tab-link" [class.active]="activeTab === 'enquiries'" (click)="setTab('enquiries')">
+      <span class="tab-icon">💬</span> Enquiry Desk
+    </button>
+    <button class="tab-link" [class.active]="activeTab === 'platform-reviews'" (click)="setTab('platform-reviews')">
+      <span class="tab-icon">⭐</span> Platform Reviews
+    </button>
+    <button class="tab-link" [class.active]="activeTab === 'property-reviews'" (click)="setTab('property-reviews')">
+      <span class="tab-icon">🏠</span> Booked Property Reviews
+    </button>
+  </div>
+
+  <!-- Filter & Search Section -->
+  <div class="table-card glass-card">
+    <div class="table-header-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Filter reviews & enquiries..." [(ngModel)]="searchText" (ngModelChange)="applyFilters()">
+      </div>
+      <div class="table-actions">
+        <div class="filter-dropdown">
+          <label>Type: </label>
+          <select [(ngModel)]="selectedType" (change)="applyFilters()">
+            <option value="All">All</option>
+            <option value="Enquiry">Enquiry</option>
+            <option value="Platform Review">Platform Review</option>
+            <option value="Property Review">Property Review</option>
+          </select>
+        </div>
+        <div class="filter-dropdown">
+          <label>Status: </label>
+          <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ENQUIRY DESK TABLE -->
+    <div class="agy-table-container" *ngIf="activeTab === 'enquiries'">
+      <div class="agy-table-title">Enquiries</div>
+      <table class="agy-table">
+        <thead>
+          <tr>
+            <th>TICKET ID</th>
+            <th>TYPE</th>
+            <th>CUSTOMER</th>
+            <th>TOPIC</th>
+            <th>MESSAGE SNIPPET</th>
+            <th>RATING</th>
+            <th>STATUS</th>
+            <th class="text-center">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Empty State -->
+          <tr *ngIf="filteredEnquiries.length === 0">
+            <td colspan="8" class="empty-state-row">
+              <div class="empty-icon">📭</div>
+              <h4>No Enquiries Found</h4>
+              <p>Try adjusting your search filters or check back later.</p>
+            </td>
+          </tr>
+          
+          <tr *ngFor="let item of filteredEnquiries | slice:(enquiryPage-1)*pageSize : enquiryPage*pageSize">
+            <td><span class="id-badge font-mono">TK-E{{ item.id }}</span></td>
+            <td><span class="type-badge badge-enquiry">Enquiry</span></td>
+            <td class="fw-600 text-dark">{{ item.buyerName || item.name }}</td>
+            <td class="text-muted">{{ item.subject || 'General support' }}</td>
+            <td class="message-cell">"{{ item.message | slice:0:60 }}{{ item.message.length > 60 ? '...' : '' }}"</td>
+            <td><span class="empty-rating">-</span></td>
+            <td>
+              <span class="status-pill" [class.status-pending]="item.status !== 'Resolved'" [class.status-resolved]="item.status === 'Resolved'">
+                {{ item.status === 'Resolved' ? 'Resolved' : 'Pending' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <button *ngIf="item.status !== 'Resolved'" (click)="openRespondModal(item, 'enquiry')" class="btn-action btn-respond">Respond</button>
+                <button *ngIf="item.status === 'Resolved'" (click)="openViewModal(item, 'enquiry')" class="btn-action btn-view">View</button>
+                <button (click)="openDeleteModal(item.id, 'enquiry')" class="btn-action btn-delete">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Enquiry Pagination -->
+      <div class="agy-table-pagination">
+        <div class="agy-table-pagination-controls">
+          <app-pagination 
+            [currentPage]="enquiryPage" 
+            [totalItems]="filteredEnquiries.length" 
+            [pageSize]="pageSize" 
+            (pageChange)="enquiryPage = $event; cdr.detectChanges()">
+          </app-pagination>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLATFORM REVIEWS TABLE -->
+    <div class="agy-table-container" *ngIf="activeTab === 'platform-reviews'">
+      <div class="agy-table-title">Platform Reviews</div>
+      <table class="agy-table">
+        <thead>
+          <tr>
+            <th>TICKET ID</th>
+            <th>TYPE</th>
+            <th>CUSTOMER</th>
+            <th>TOPIC</th>
+            <th>MESSAGE SNIPPET</th>
+            <th>RATING</th>
+            <th>STATUS</th>
+            <th class="text-center">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredPlatformReviews.length === 0">
+            <td colspan="8" class="empty-state-row">
+              <div class="empty-icon">📭</div>
+              <h4>No Platform Reviews Found</h4>
+            </td>
+          </tr>
+          
+          <tr *ngFor="let item of filteredPlatformReviews | slice:(platformPage-1)*pageSize : platformPage*pageSize">
+            <td><span class="id-badge font-mono">TK-P{{ item.id }}</span></td>
+            <td><span class="type-badge badge-review">Review</span></td>
+            <td class="fw-600 text-dark">{{ item.buyerName }}</td>
+            <td class="text-muted">Apex World Portal</td>
+            <td class="message-cell">"{{ item.comment | slice:0:60 }}{{ item.comment.length > 60 ? '...' : '' }}"</td>
+            <td>
+              <div class="rating-stars">
+                <div class="stars-row">
+                  <span *ngFor="let s of getStars(item.rating)" class="star-icon filled">★</span>
+                  <span *ngFor="let s of getEmptyStars(item.rating)" class="star-icon empty">★</span>
+                </div>
+                <div class="rating-num">({{ item.rating }})</div>
+              </div>
+            </td>
+            <td>
+              <span class="status-pill" [class.status-pending]="item.status !== 'Resolved'" [class.status-resolved]="item.status === 'Resolved'">
+                {{ item.status === 'Resolved' ? 'Resolved' : 'Pending' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <button *ngIf="item.status !== 'Resolved'" (click)="openRespondModal(item, 'review')" class="btn-action btn-respond">Respond</button>
+                <button *ngIf="item.status === 'Resolved'" (click)="openViewModal(item, 'review')" class="btn-action btn-view">View</button>
+                <button (click)="openDeleteModal(item.id, 'review')" class="btn-action btn-delete">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Platform Pagination -->
+      <div class="agy-table-pagination">
+        <div class="agy-table-pagination-controls">
+          <app-pagination 
+            [currentPage]="platformPage" 
+            [totalItems]="filteredPlatformReviews.length" 
+            [pageSize]="pageSize" 
+            (pageChange)="platformPage = $event; cdr.detectChanges()">
+          </app-pagination>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKED PROPERTY REVIEWS TABLE -->
+    <div class="agy-table-container" *ngIf="activeTab === 'property-reviews'">
+      <div class="agy-table-title">Booked Property Reviews</div>
+      <table class="agy-table">
+        <thead>
+          <tr>
+            <th>REVIEW ID</th>
+            <th>TYPE</th>
+            <th>BUYER</th>
+            <th>PURCHASED PROPERTY</th>
+            <th>REVIEW SNIPPET</th>
+            <th>RATING</th>
+            <th>STATUS</th>
+            <th class="text-center">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredPropertyReviews.length === 0">
+            <td colspan="8" class="empty-state-row">
+              <div class="empty-icon">📭</div>
+              <h4>No Booked Property Reviews Found</h4>
+            </td>
+          </tr>
+          
+          <tr *ngFor="let item of filteredPropertyReviews | slice:(propertyPage-1)*pageSize : propertyPage*pageSize">
+            <td><span class="id-badge font-mono">TK-B{{ item.id }}</span></td>
+            <td><span class="type-badge badge-review">Review</span></td>
+            <td class="fw-600 text-dark">{{ item.buyerName }}</td>
+            <td class="property-name text-dark fw-600">{{ item.propertyName || 'Property #' + item.propertyId }}</td>
+            <td class="message-cell">"{{ item.comment | slice:0:60 }}{{ item.comment.length > 60 ? '...' : '' }}"</td>
+            <td>
+              <div class="rating-stars">
+                <div class="stars-row">
+                  <span *ngFor="let s of getStars(item.rating)" class="star-icon filled">★</span>
+                  <span *ngFor="let s of getEmptyStars(item.rating)" class="star-icon empty">★</span>
+                </div>
+                <div class="rating-num">({{ item.rating }})</div>
+              </div>
+            </td>
+            <td>
+              <span class="status-pill" [class.status-pending]="item.status !== 'Resolved'" [class.status-resolved]="item.status === 'Resolved'">
+                {{ item.status === 'Resolved' ? 'Resolved' : 'Pending' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="action-buttons">
+                <button *ngIf="item.status !== 'Resolved'" (click)="openRespondModal(item, 'review')" class="btn-action btn-respond">Respond</button>
+                <button *ngIf="item.status === 'Resolved'" (click)="openViewModal(item, 'review')" class="btn-action btn-view">View</button>
+                <button (click)="openDeleteModal(item.id, 'review')" class="btn-action btn-delete">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Property Pagination -->
+      <div class="agy-table-pagination">
+        <div class="agy-table-pagination-controls">
+          <app-pagination 
+            [currentPage]="propertyPage" 
+            [totalItems]="filteredPropertyReviews.length" 
+            [pageSize]="pageSize" 
+            (pageChange)="propertyPage = $event; cdr.detectChanges()">
+          </app-pagination>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- VIEW MODAL -->
+<div class="modal-overlay" *ngIf="isViewModalOpen">
+  <div class="modal-card modern-modal view-detail-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        {{ selectedItemType === 'enquiry' ? 'Enquiry Details' : 'Review Details' }}
+      </h3>
+      <button (click)="closeViewModal()" class="close-x">&times;</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedItem">
+      <div class="detail-row">
+        <span class="detail-label">ID:</span>
+        <span class="detail-val font-mono">{{ selectedItemType === 'enquiry' ? 'TK-E' : (selectedItem.reviewType === 'Platform' ? 'TK-P' : 'TK-B') }}{{ selectedItem.id }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Sender/Buyer:</span>
+        <span class="detail-val fw-600">{{ selectedItemType === 'enquiry' ? (selectedItem.buyerName || selectedItem.name) : selectedItem.buyerName }}</span>
+      </div>
+      <div class="detail-row" *ngIf="selectedItemType === 'enquiry'">
+        <span class="detail-label">Email:</span>
+        <span class="detail-val">{{ selectedItem.email }}</span>
+      </div>
+      <div class="detail-row" *ngIf="selectedItemType === 'enquiry'">
+        <span class="detail-label">Phone:</span>
+        <span class="detail-val">{{ selectedItem.phone }}</span>
+      </div>
+      <div class="detail-row" *ngIf="selectedItemType === 'review' && selectedItem.reviewType === 'Property'">
+        <span class="detail-label">Property:</span>
+        <span class="detail-val fw-600">{{ selectedItem.propertyName || 'Property #' + selectedItem.propertyId }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date Submitted:</span>
+        <span class="detail-val">{{ selectedItem.createdAt | date:'medium' }}</span>
+      </div>
+      <div class="detail-row" *ngIf="selectedItemType === 'review'">
+        <span class="detail-label">Rating:</span>
+        <span class="detail-val">
+          <span *ngFor="let s of getStars(selectedItem.rating)" class="star-icon filled">★</span>
+          <span *ngFor="let s of getEmptyStars(selectedItem.rating)" class="star-icon empty">★</span>
+          ({{ selectedItem.rating }} / 5)
+        </span>
+      </div>
+      
+      <div class="divider"></div>
+
+      <div class="content-block">
+        <h4 class="block-title">{{ selectedItemType === 'enquiry' ? 'Message' : 'Review Comment' }}</h4>
+        <p class="block-content">"{{ selectedItemType === 'enquiry' ? selectedItem.message : selectedItem.comment }}"</p>
+      </div>
+
+      <div class="content-block admin-response-block" *ngIf="selectedItem.adminResponse">
+        <h4 class="block-title">Admin Response</h4>
+        <p class="block-content font-italic">"{{ selectedItem.adminResponse }}"</p>
+        <span class="response-date text-muted font-sm">Responded on {{ selectedItem.responseDate | date:'medium' }}</span>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button (click)="closeViewModal()" class="btn-cancel">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESPOND MODAL -->
+<div class="modal-overlay" *ngIf="isRespondModalOpen">
+  <div class="modal-card modern-modal">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        Respond to {{ selectedItemType === 'enquiry' ? 'Enquiry' : 'Review' }}
+      </h3>
+      <button (click)="closeRespondModal()" class="close-x">&times;</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedItem">
+      <div class="original-message-preview">
+        <strong>Original Message:</strong>
+        <p class="text-italic">"{{ selectedItemType === 'enquiry' ? selectedItem.message : selectedItem.comment }}"</p>
+      </div>
+      
+      <div class="floating-group textarea-group">
+        <textarea id="resp-text" rows="5" [(ngModel)]="adminResponseText" placeholder="Enter your response..."></textarea>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button (click)="closeRespondModal()" class="btn-cancel">Cancel</button>
+      <button (click)="submitResponse()" class="btn-submit btn-primary">Submit Response</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" *ngIf="isDeleteModalOpen">
+  <div class="modal-card modern-modal">
+    <div class="modal-header danger-header">
+      <div class="modal-icon-ring">⚠️</div>
+      <h3 class="modal-title">Delete Confirmation</h3>
+    </div>
+    <div class="modal-body">
+      <p>Are you absolutely sure you want to permanently delete this item? This action cannot be undone and the record will be removed from the database.</p>
+    </div>
+    <div class="modal-footer">
+      <button (click)="closeDeleteModal()" class="btn-cancel">Cancel</button>
+      <button (click)="confirmDelete()" class="btn-danger">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+

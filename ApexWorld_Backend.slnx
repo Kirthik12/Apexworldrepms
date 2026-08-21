@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ApexWorld.Tests/ApexWorld.Tests.csproj" />
+  <Project Path="ApexWorld_Backend/ApexWorld_Backend.csproj" />
+</Solution>

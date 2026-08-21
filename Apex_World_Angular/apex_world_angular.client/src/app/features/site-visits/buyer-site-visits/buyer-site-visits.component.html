@@ -1,0 +1,316 @@
+<!-- ═══ PAGE WRAPPER ═══ -->
+<div class="nb-page nb-wide" *ngIf="property">
+
+  <!-- Breadcrumb -->
+  <a routerLink="/buyer-dashboard/properties" class="nb-breadcrumb">← Back to Properties</a>
+
+  <!-- Page Title Row -->
+  <div class="nb-title-row">
+    <div>
+      <h1 class="nb-page-h1">New Booking</h1>
+      <p class="nb-page-desc">Fill in the details below to book your dream property.</p>
+    </div>
+  </div>
+
+  <!-- ═══ STEP WIZARD BAR ═══ -->
+  <div class="nb-wizard-bar">
+    <div class="nb-wz-step" [class.active]="currentStep >= 1">
+      <div class="nb-wz-circle">1</div>
+      <div class="nb-wz-info">
+        <div class="nb-wz-label">Step 1</div>
+        <div class="nb-wz-name">Buyer Details</div>
+      </div>
+    </div>
+    <div class="nb-wz-line" [style.background]="currentStep >= 2 ? 'var(--primary)' : '#e5e7eb'"></div>
+    <div class="nb-wz-step" [class.active]="currentStep >= 2">
+      <div class="nb-wz-circle">2</div>
+      <div class="nb-wz-info">
+        <div class="nb-wz-label">Step 2</div>
+        <div class="nb-wz-name">Book Site Visit Schedule</div>
+      </div>
+    </div>
+    <div class="nb-wz-line" [style.background]="currentStep >= 3 ? 'var(--primary)' : '#e5e7eb'"></div>
+    <div class="nb-wz-step" [class.active]="currentStep >= 3">
+      <div class="nb-wz-circle">3</div>
+      <div class="nb-wz-info">
+        <div class="nb-wz-label">Step 3</div>
+        <div class="nb-wz-name">Review &amp; Confirm</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN BODY: FORM + SIDEBAR ═══ -->
+  <div class="nb-layout">
+
+    <!-- ────── LEFT: FORM AREA ────── -->
+    <div class="nb-form-area" *ngIf="!isSuccess">
+
+      <form [formGroup]="bookingForm">
+        <!-- ──────────────────────────────────────────
+             STEP 1 — BUYER DETAILS
+        ────────────────────────────────────────── -->
+        <div class="nb-panel" [class.active]="currentStep === 1">
+          <div class="nb-form-box">
+            <div class="nb-form-box-title">👤 Buyer Personal Information</div>
+
+            <div class="nb-row-2">
+              <div class="nb-field">
+                <label class="nb-lbl">First Name <span class="required-star">*</span></label>
+                <input type="text" class="nb-inp" formControlName="firstName" placeholder="First Name" [class.is-invalid-custom]="bookingForm.get('firstName')?.invalid && (bookingForm.get('firstName')?.dirty || bookingForm.get('firstName')?.touched)">
+                <div *ngIf="bookingForm.get('firstName')?.invalid && (bookingForm.get('firstName')?.dirty || bookingForm.get('firstName')?.touched)" class="invalid-feedback-custom">Field is required</div>
+              </div>
+              <div class="nb-field">
+                <label class="nb-lbl">Last Name <span class="required-star">*</span></label>
+                <input type="text" class="nb-inp" formControlName="lastName" placeholder="Last Name" [class.is-invalid-custom]="bookingForm.get('lastName')?.invalid && (bookingForm.get('lastName')?.dirty || bookingForm.get('lastName')?.touched)">
+                <div *ngIf="bookingForm.get('lastName')?.invalid && (bookingForm.get('lastName')?.dirty || bookingForm.get('lastName')?.touched)" class="invalid-feedback-custom">Field is required</div>
+              </div>
+              <div class="nb-field">
+                <label class="nb-lbl">Email Address <span class="required-star">*</span></label>
+                <input type="email" class="nb-inp" formControlName="email" placeholder="you@email.com" [class.is-invalid-custom]="bookingForm.get('email')?.invalid && (bookingForm.get('email')?.dirty || bookingForm.get('email')?.touched)">
+                <div *ngIf="bookingForm.get('email')?.invalid && (bookingForm.get('email')?.dirty || bookingForm.get('email')?.touched)" class="invalid-feedback-custom">Field is required</div>
+              </div>
+              <div class="nb-field">
+                <label class="nb-lbl">Phone Number <span class="required-star">*</span></label>
+                <input type="tel" class="nb-inp" formControlName="phoneNumber" placeholder="+91 99999 99999" [class.is-invalid-custom]="bookingForm.get('phoneNumber')?.invalid && (bookingForm.get('phoneNumber')?.dirty || bookingForm.get('phoneNumber')?.touched)">
+                <div *ngIf="bookingForm.get('phoneNumber')?.invalid && (bookingForm.get('phoneNumber')?.dirty || bookingForm.get('phoneNumber')?.touched)" class="invalid-feedback-custom">Field is required</div>
+              </div>
+            </div>
+
+            <div class="nb-field">
+              <label class="nb-lbl">Permanent Address <span class="required-star">*</span></label>
+              <textarea class="nb-inp nb-textarea" formControlName="permanentAddress" placeholder="Enter full residential address..." [class.is-invalid-custom]="bookingForm.get('permanentAddress')?.invalid && (bookingForm.get('permanentAddress')?.dirty || bookingForm.get('permanentAddress')?.touched)"></textarea>
+              <div *ngIf="bookingForm.get('permanentAddress')?.invalid && (bookingForm.get('permanentAddress')?.dirty || bookingForm.get('permanentAddress')?.touched)" class="invalid-feedback-custom">Field is required</div>
+            </div>
+            
+            <div class="nb-field">
+              <label class="nb-lbl">Purpose of Purchase</label>
+              <select class="nb-inp nb-sel" formControlName="purposeOfPurchase">
+                <option value="Self Residence">Self Residence</option>
+                <option value="Investment / Rental Income">Investment / Rental Income</option>
+                <option value="Commercial Use">Commercial Use</option>
+                <option value="Resale Intent">Resale Intent</option>
+              </select>
+            </div>
+
+            <div class="nb-actions-row">
+              <a routerLink="/buyer-dashboard/properties" class="nb-btn-cancel">Cancel</a>
+              <button type="button" class="nb-btn-save" (click)="nextStep()">Save &amp; Proceed →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ──────────────────────────────────────────
+             STEP 2 — BOOK SITE VISIT SCHEDULE
+        ────────────────────────────────────────── -->
+        <div class="nb-panel" [class.active]="currentStep === 2">
+          <div class="ss-selector-grid">
+            <!-- Dynamic Calendar Card -->
+            <div class="ss-card ss-calendar-card">
+              <div class="ss-calendar-header">
+                <button type="button" class="ss-cal-nav" (click)="prevMonth()">&#8592;</button>
+                <div class="ss-card-title">{{ selectedDate | date:'MMMM yyyy' }}</div>
+                <button type="button" class="ss-cal-nav" (click)="nextMonth()">&#8594;</button>
+              </div>
+              <div class="ss-calendar-body" style="padding: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; margin-bottom: 12px; font-size: 0.85rem; font-weight: 600; color: #64748B;">
+                  <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center;">
+                  <div *ngFor="let empty of emptyPrefixDays"></div>
+                  <div *ngFor="let day of calendarDays" 
+                       (click)="selectDate(day)"
+                       style="padding: 8px; border-radius: 8px; transition: 0.2s;"
+                       [ngStyle]="{
+                         'cursor': isDateDisabled(day) ? 'not-allowed' : 'pointer',
+                         'opacity': isDateDisabled(day) ? '0.4' : '1',
+                         'background': selectedDate.getDate() === day ? 'var(--primary)' : (isDateDisabled(day) ? '#e2e8f0' : '#F1F5F9'),
+                         'color': selectedDate.getDate() === day ? '#fff' : '#1E293B',
+                         'font-weight': selectedDate.getDate() === day ? '600' : '400'
+                       }">
+                    {{ day }}
+                  </div>
+                </div>
+              </div>
+              <div style="text-align: center; padding-bottom: 16px; color: var(--primary); font-weight: 600; font-size: 0.9rem;">
+                Selected Date: {{ selectedDate | date:'longDate' }}
+              </div>
+            </div>
+
+            <!-- Time Slots Card -->
+            <div class="ss-card ss-slots-card">
+              <div class="ss-card-title">Select Time Slot</div>
+              <div class="ss-slots-grid">
+                <button type="button" class="ss-slot-btn" *ngFor="let slot of availableSlots" [class.active]="selectedSlot === slot" (click)="selectSlot(slot)">
+                  {{ slot }}
+                </button>
+              </div>
+              <div class="ss-slots-alert">
+                ✅ Our relationship manager will guide you during the visit and provide all details.
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Guidelines Card -->
+          <div class="nb-guide-card">
+            <div class="nb-form-box-title">Important Guidelines</div>
+            <div class="nb-guide-list">
+              <div class="nb-guide-item">
+                <span class="nb-guide-icon">⏰</span>
+                <div>
+                  <strong>Arrive 10 minutes early</strong>
+                  <p>Ensure you sync with relationship manager.</p>
+                </div>
+              </div>
+              <div class="nb-guide-item">
+                <span class="nb-guide-icon">🪪</span>
+                <div>
+                  <strong>Valid ID Proof Required</strong>
+                  <p>Bring Aadhaar/PAN for verification checklist.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nb-actions-row">
+            <button type="button" class="nb-btn-cancel" (click)="prevStep()">← Back</button>
+            <button type="button" class="nb-btn-save" (click)="nextStep()">Save &amp; Proceed →</button>
+          </div>
+        </div>
+
+        <!-- ──────────────────────────────────────────
+             STEP 3 — REVIEW & CONFIRM
+        ────────────────────────────────────────── -->
+        <div class="nb-panel" [class.active]="currentStep === 3">
+          <div class="nb-form-box">
+            <div class="nb-form-box-title">🔍 Review &amp; Confirm Your Booking</div>
+
+            <div class="nb-review-cards">
+              <div class="nb-review-card">
+                <div class="nb-rv-title">🏠 Property Details</div>
+                <div class="nb-rv-row"><span>Property</span><strong>{{ property.title }}</strong></div>
+                <div class="nb-rv-row"><span>Location</span><strong>{{ property.address }}</strong></div>
+                <div class="nb-rv-row"><span>Type</span><strong>{{ property.category?.name || 'Apartment' }}</strong></div>
+                <div class="nb-rv-row"><span>Area</span><strong>{{ property.areaSize }} sq.ft</strong></div>
+              </div>
+              <div class="nb-review-card">
+                <div class="nb-rv-title">📅 Site Visit Schedule</div>
+                <div class="nb-rv-row"><span>Booking Date</span><strong>{{ selectedDate | date:'longDate' }}</strong></div>
+                <div class="nb-rv-row"><span>Booking Time</span><strong>{{ selectedSlot }}</strong></div>
+              </div>
+              <div class="nb-review-card">
+                <div class="nb-rv-title">👤 Buyer Details</div>
+                <div class="nb-rv-row"><span>Name</span><strong>{{ bookingForm.value.firstName }} {{ bookingForm.value.lastName }}</strong></div>
+                <div class="nb-rv-row"><span>Email</span><strong>{{ bookingForm.value.email }}</strong></div>
+                <div class="nb-rv-row"><span>Phone</span><strong>{{ bookingForm.value.phoneNumber }}</strong></div>
+                <div class="nb-rv-row"><span>Purpose</span><strong>{{ bookingForm.value.purposeOfPurchase }}</strong></div>
+              </div>
+              <div class="nb-review-card">
+                <div class="nb-rv-title">💰 Price Summary</div>
+                <div class="nb-rv-row"><span>Base Value</span><strong>₹ {{ taxBaseValue | number:'1.0-0' }}</strong></div>
+                <div class="nb-rv-row"><span>GST (12%)</span><strong>₹ {{ gstValue | number:'1.0-0' }}</strong></div>
+                <div class="nb-rv-row"><span>Registration (3%)</span><strong>₹ {{ regValue | number:'1.0-0' }}</strong></div>
+                <div class="nb-rv-row nb-rv-total">
+                  <span>Total Payable</span>
+                  <strong class="nb-rv-price">₹ {{ totalValue | number:'1.0-0' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms -->
+            <label class="nb-terms">
+              <input type="checkbox" checked disabled>
+              I agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a> of Apex World Real Estate.
+            </label>
+
+            <div class="nb-actions-row">
+              <button type="button" class="nb-btn-cancel" (click)="prevStep()">← Back</button>
+              <button type="button" class="nb-btn-save nb-btn-confirm" [disabled]="isSubmitting || bookingForm.invalid" (click)="confirmBooking()">
+                {{ isSubmitting ? 'Confirming...' : '📅 Confirm Site-Visit Schedule' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+    </div>
+    <!-- ────── END LEFT ────── -->
+
+    <!-- Success Banner -->
+    <div class="nb-form-area" *ngIf="isSuccess">
+      <div class="nb-panel active">
+        <div class="nb-success" style="display: block;">
+          <div class="nb-success-icon">🎉</div>
+          <h3>Site - Visit Schedule Confirmed!</h3>
+          <p>Your site visit for <strong>{{ property.title }}</strong> has been successfully scheduled.<br>
+             Booking ID: <strong>{{ successBookingId }}</strong><br>
+             Our relationship manager will contact you shortly.</p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+            <a routerLink="/buyer-dashboard/bookings" class="nb-btn-save" style="text-decoration:none;">Go to My Bookings →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────── RIGHT: SIDEBAR ────── -->
+    <aside class="nb-sidebar">
+
+      <!-- Booking Summary Card -->
+      <div class="nb-sb-card">
+        <div class="nb-sb-img-wrap">
+          <img [src]="coverImage" [alt]="property.title">
+          <div class="nb-sb-img-overlay"></div>
+        </div>
+        <div class="nb-sb-body">
+          <div class="nb-sb-prop-name">{{ property.title }}</div>
+          <div class="nb-sb-prop-type">{{ property.category?.name || 'Property' }} • {{ property.address }}</div>
+
+          <div class="nb-sb-divider"></div>
+
+          <div class="nb-sb-section-title">Booking Summary</div>
+          <div class="nb-sb-rows">
+            <div class="nb-sb-row">
+              <span>Base Property Value</span>
+              <span>₹ {{ taxBaseValue | number:'1.0-0' }}</span>
+            </div>
+            <div class="nb-sb-row">
+              <span>GST (12%)</span>
+              <span>₹ {{ gstValue | number:'1.0-0' }}</span>
+            </div>
+            <div class="nb-sb-row">
+              <span>Registration Fees (3%)</span>
+              <span>₹ {{ regValue | number:'1.0-0' }}</span>
+            </div>
+          </div>
+          <div class="nb-sb-total-row">
+            <span>Total Amount Payable</span>
+            <span class="nb-sb-grand">₹ {{ totalValue | number:'1.0-0' }}</span>
+          </div>
+          <div class="nb-sb-note">✅ Includes all applicable taxes and fees.</div>
+        </div>
+      </div>
+
+      <!-- Why Book Card -->
+      <div class="nb-sb-card nb-sb-why">
+        <div class="nb-sb-section-title" style="padding:18px 18px 14px;">Why Book with Apex World?</div>
+        <div class="nb-why-list">
+          <div class="nb-why-item">
+            <div class="nb-why-dot" style="background:#EFF6FF;color:#2563EB;">✔</div>
+            <div>
+              <div class="nb-why-title">Verified Properties</div>
+              <div class="nb-why-sub">All listings verified by on-site admins</div>
+            </div>
+          </div>
+          <div class="nb-why-item">
+            <div class="nb-why-dot" style="background:#D1FAE5;color:#059669;">🔒</div>
+            <div>
+              <div class="nb-why-title">Secure Transactions</div>
+              <div class="nb-why-sub">Bank-grade escrow routing</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div><!-- /nb-layout -->
+</div><!-- /nb-page -->
