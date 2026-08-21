@@ -1,0 +1,47 @@
+name: ApexWorld Backend CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ApexWorld.Api/ApexWorld.Api.csproj
+
+      - name: Build
+        run: dotnet build ApexWorld_Backend/ApexWorld_Backend/ApexWorld_Backend.csproj --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test ApexWorld_Backend/ApexWorld.Tests/ApexWorld.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: apexworld-test-results
+          path: ApexWorld_Backend/ApexWorld.TestsTestResults/test-results.trx
