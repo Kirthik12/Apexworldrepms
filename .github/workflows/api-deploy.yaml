@@ -2,24 +2,26 @@ name: ApexWorld Backend CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'ApexWorld_Backend/**'
+      - 'ApexWorld.Tests/**'
+      - 'ApexWorld.UnitTests/**'
       - '.github/workflows/api-deploy.yaml'
 
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'ApexWorld_Backend/**'
+      - 'ApexWorld.Tests/**'
+      - 'ApexWorld.UnitTests/**'
       - '.github/workflows/api-deploy.yaml'
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: Backend
 
     steps:
       - name: Checkout repository
@@ -37,11 +39,16 @@ jobs:
         run: dotnet build ApexWorld_Backend/ApexWorld_Backend/ApexWorld_Backend.csproj --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test ApexWorld_Backend/ApexWorld.Tests/ApexWorld.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test ApexWorld.Tests/ApexWorld.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Test Unit Tests
+        run: dotnet test ApexWorld.UnitTests/ApexWorld.UnitTests.csproj --configuration Release --logger "trx;LogFileName=unit-test-results.trx"
 
       - name: Publish test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: apexworld-test-results
-          path: ApexWorld_Backend/ApexWorld.Tests/TestResults/test-results.trx
+          path: |
+            ApexWorld.Tests/TestResults/test-results.trx
+            ApexWorld.UnitTests/TestResults/unit-test-results.trx
