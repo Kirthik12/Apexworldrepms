@@ -33,15 +33,15 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore ApexWorld_Backend/ApexWorld_Backend/ApexWorld_Backend.csproj
+        run: dotnet restore ApexWorld_Backend/ApexWorld_Backend.csproj
 
       - name: Build
-        run: dotnet build ApexWorld_Backend/ApexWorld_Backend/ApexWorld_Backend.csproj --no-restore --configuration Release
+        run: dotnet build ApexWorld_Backend/ApexWorld_Backend.csproj --no-restore --configuration Release
 
       - name: Test
         run: dotnet test ApexWorld.Tests/ApexWorld.Tests.csproj --configuration Release --logger "trx;LogFileName=test-results.trx"
 
-      - name: Test Unit Tests
+      - name: Unit Test
         run: dotnet test ApexWorld.UnitTests/ApexWorld.UnitTests.csproj --configuration Release --logger "trx;LogFileName=unit-test-results.trx"
 
       - name: Publish test results
