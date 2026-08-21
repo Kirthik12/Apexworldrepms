@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [ main ]
     paths:
-      - 'Backend/**'
+      - 'ApexWorld_Backend/**'
       - '.github/workflows/api-deploy.yaml'
 
 jobs:
